@@ -1,0 +1,332 @@
+{% extends "appCentral/padre.html"%}
+{% load static %}
+{% block content %}
+<h2 class="text-center">Califica aquí tus compras</h2>
+<div style="margin: 5%;">
+    <p class="text-center">Sólo puedes calificar la puntualidad de los proveedores y la calidad de los productos una vez que ya haya transcurrido el tiempo acordado por ambas partes</p>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="accordion" id="assessment" style="width: 100%; margin-bottom: 5%">
+                <div class="accordion-item">
+                    <button class="accordion-button collapsed bg-primary bg-opacity-25" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEvaluations" aria-expanded="true" aria-controls="collapseEvaluations">
+                        <h4 class="accordion-header" id="headingOne">
+                            Tipos de evaluaciones
+                        </h4>
+                    </button>
+                    <div id="collapseEvaluations" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#assessment">
+                        <div class="accordion-body bg-primary bg-opacity-25">
+                            <div class="list-group" >
+                                <button onclick="change_item_selected(0)" id="puntuality_quality" class="list-group-item list-group-item-action bg-light bg-opacity-100" aria-current="true">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">
+                                            Evaluar puntualidad y calidad
+                                        </h5>
+                                        <small id="small_puntuality_quality" class="text-muted"></small>
+                                        <abbr title="Haz click aquí para calificar las compras no evaluadas ni por puntualidad del proveedor ni por calidad del producto">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                                            </svg>
+                                        </abbr>
+                                    </div>
+                                </button>
+                                <button onclick="change_item_selected(1)" id="puntuality" class="list-group-item list-group-item-action bg-light bg-opacity-100">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">
+                                            Evaluar puntualidad
+                                        </h5>
+                                        <small id="small_puntuality" class="text-muted"></small>
+                                        <abbr title="Haz click aquí para calificar las compras no evaluadas por puntualidad del proveedor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                                            </svg>
+                                        </abbr>
+                                    </div>
+                                </button>
+                                <button onclick="change_item_selected(2)" id="quality" class="list-group-item list-group-item-action bg-light bg-opacity-100 btn-lg">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">
+                                            Evaluar calidad
+                                        </h5>
+                                        <small id="small_quality" class="text-muted"></small>
+                                        <abbr title="Haz click aquí para calificar las compras no evaluadas por calidad del producto">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                                            </svg>
+                                        </abbr>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8 bg-light" id="assessment_body" style="overflow: auto; height: 700px">
+
+        </div>
+    </div>
+</div>
+{{ purchases_puntuality_quality|json_script:"purchases_puntuality_quality" }}
+{{ purchases_puntuality|json_script:"purchases_puntuality" }}
+{{ purchases_quality|json_script:"purchases_quality" }}
+
+<script>
+    var evaluations_ids=["puntuality_quality","puntuality","quality"]
+    var array=[JSON.parse(document.getElementById("purchases_puntuality_quality").textContent),JSON.parse(document.getElementById("purchases_puntuality").textContent),JSON.parse(document.getElementById("purchases_quality").textContent)]
+
+    function fill_stars(n,id){
+        ids=["puntuality_first_","puntuality_second_","puntuality_third_","puntuality_fourth_","puntuality_fifth_","quality_first_","quality_second_","quality_third_","quality_fourth_","quality_fifth_"]
+        if(n <5 ){
+            document.getElementById("cantidad_puntualidad_"+id).value= n + 1;
+            for(let index =0; index<5; index=index+1){
+                if(index <= n){
+                    document.getElementById(ids[index]+id).classList.add("star-checked");
+                }
+                else{
+                    document.getElementById(ids[index]+id).classList.remove("star-checked");
+                }
+            }
+        }
+        else{
+            document.getElementById("cantidad_calidad_"+id).value= n - 4;
+            for(let index =5; index<10; index=index+1){
+                if(index <= n){
+                    document.getElementById(ids[index]+id).classList.add("star-checked");
+                }
+                else{
+                    document.getElementById(ids[index]+id).classList.remove("star-checked");
+                }
+            }
+        }
+    }
+
+    function add_evaluative_letter(n) {
+        if (document.getElementById("evaluate_" + evaluations_ids[n]) === null) {
+            let grilla = '<div id="evaluation_' + evaluations_ids[n] + '" style="margin-bottom: 5%">';
+            for (let index in array[n]) {
+                if (array[n][index] !== undefined) {
+                    let code = '<div class="container" id="evaluate_' + evaluations_ids[n] + '_' + array[n][index].id + '" style="border-radius: 10px ;margin-top: 20px ;border-style: double; background-color: lightyellow">' +
+                        '<div class="row"><label style="text-align: center">Proveedor: ' + array[n][index].provider + '</label></div>' +
+                        '<div class="row" ><div class="col-6">Bien: ' + array[n][index].good + '</div><div class="col-6">Cantidad:' + array[n][index].amount + array[n][index].unit + 's</div></div>' +
+                        '<div class="row" ><div class="col-6">Fecha del pedido: ' + array[n][index].date_joined + '</div>';
+                    if (array[n][index].time.length == 2) {
+                        code = code + '<div class="col-6">Fecha de la entrega: ' + array[n][index].delivery_date + ' entre las ' + array[n][index].time[0] + ' y ' + array[n][index].time[1] + '</div></div>';
+                    } else {
+                        code = code + '<div class="col-6">Fecha de la entrega: ' + array[n][index].delivery_date + ' a las ' + array[n][index].time + '</div></div>';
+                    }
+                    if (array[n][index].dispatch) {
+                        code = code + '<div class="row"><label style="text-align: center">Compra con despacho</label></div>';
+                    } else {
+                        code = code + '<div class="row"><label style="text-align: center">Compra con retiro en tienda</label></div>';
+                    }
+                    code = code + '<div class="row" id="footer_evaluation_' + array[n][index].id + '" style="margin-top: 20px; margin-bottom: 10px">';
+                    if (evaluations_ids[n] === "puntuality_quality") {
+                        code = code + '<div class="col-6" id="button_evaluate_quality_' + array[n][index].id + '"><button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#calidad_' + array[n][index].id + '"><b>Calificar calidad del producto</b></button></div>' +
+                            '<div class="col-6" id="button_evaluate_puntuality_' + array[n][index].id + '"><button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#puntualidad_' + array[n][index].id + '"><b>Calificar puntualidad del proveedor</b></button></div>';
+                    }
+                    if (evaluations_ids[n] === "puntuality") {
+                        code = code + '<div class="col-6" id="button_evaluate_puntuality_' + array[n][index].id + '"><button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#puntualidad_' + array[n][index].id + '"><b>Calificar puntualidad del proveedor</b></button></div>';
+                    }
+                    if (evaluations_ids[n] === "quality") {
+                        code = code + '<div class="col-6" id="button_evaluate_quality_' + array[n][index].id + '"><button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#calidad_' + array[n][index].id + '"><b>Calificar calidad del producto</b></button></div>';
+                    }
+                    code = code + '<div class="modal fade" id="puntualidad_' + array[n][index].id + '" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">\n' +
+                        '<div class="modal-dialog">\n' +
+                        '<div class="modal-content">\n' +
+                        '<div class="modal-header">\n' +
+                        '<h5 class="modal-title" id="exampleModalLabel">Puntualidad</h5>\n' +
+                        '<button type="button" id="close_assessment_puntuality_' + array[n][index].id + '" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>\n' +
+                        '</div>\n' +
+                        '<div id="div_stars_puntuality_' + array[n][index].id + '" class="modal-body text-center">\n' +
+                        'Califique la puntualidad del proveedor con estrellas. Mientras más estrellas, mejor puntuación.\n' +
+                        '<br><span onclick="fill_stars(0,' + array[n][index].id + ')" class="fa fa-star star" id="puntuality_first_' + array[n][index].id + '"></span>' +
+                        '<span onclick="fill_stars(1,' + array[n][index].id + ')" class="fa fa-star star" id="puntuality_second_' + array[n][index].id + '"></span>' +
+                        '<span onclick="fill_stars(2,' + array[n][index].id + ')" class="fa fa-star star" id="puntuality_third_' + array[n][index].id + '"></span>' +
+                        '<span onclick="fill_stars(3,' + array[n][index].id + ')" class="fa fa-star star" id="puntuality_fourth_' + array[n][index].id + '"></span>' +
+                        '<span onclick="fill_stars(4,' + array[n][index].id + ')" class="fa fa-star star" id="puntuality_fifth_' + array[n][index].id + '"></span>' +
+                        '</div>\n' +
+                        '<div class="modal-footer">\n' +
+                        '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>\n' +
+                        '<form onsubmit="return false;" id="form_puntuality_' + array[n][index].id + '" method="post">{% csrf_token %}' +
+                        '<input hidden type="text" name="id" value="' + array[n][index].id + '">' +
+                        '<input hidden type="text" id="cantidad_puntualidad_' + array[n][index].id + '" name="cantidad" value="0">' +
+                        '<input hidden type="text" name="type" value="puntualidad">' +
+                        '<button onclick="evaluate_puntuality(' + array[n][index].id + ');" class="btn btn-primary">Calificar</button>' +
+                        '</form>\n' +
+                        '</div></div></div></div>' +
+                        '<div class="modal fade" id="calidad_' + array[n][index].id + '" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">\n' +
+                        '<div class="modal-dialog">\n' +
+                        '<div class="modal-content">\n' +
+                        '<div class="modal-header">\n' +
+                        '<h5 class="modal-title" id="exampleModalLabel">Calidad</h5>\n' +
+                        '<button type="button" id="close_assessment_quality_' + array[n][index].id + '" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>\n' +
+                        '</div>\n' +
+                        '<div id="div_stars_quality_' + array[n][index].id + '" class="modal-body text-center">\n' +
+                        'Califique la calidad del producto con estrellas. Mientras más estrellas, mejor puntuación.\n' +
+                        '<br><span onclick="fill_stars(5,' + array[n][index].id + ')" class="fa fa-star star" id="quality_first_' + array[n][index].id + '"></span>' +
+                        '<span onclick="fill_stars(6,' + array[n][index].id + ')" class="fa fa-star star" id="quality_second_' + array[n][index].id + '"></span>' +
+                        '<span onclick="fill_stars(7,' + array[n][index].id + ')" class="fa fa-star star" id="quality_third_' + array[n][index].id + '"></span>' +
+                        '<span onclick="fill_stars(8,' + array[n][index].id + ')" class="fa fa-star star" id="quality_fourth_' + array[n][index].id + '"></span>' +
+                        '<span onclick="fill_stars(9,' + array[n][index].id + ')" class="fa fa-star star" id="quality_fifth_' + array[n][index].id + '"></span>' +
+                        '</div>\n' +
+                        '<div class="modal-footer">\n' +
+                        '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>\n' +
+                        '<form onsubmit="return false;" id="form_quality_' + array[n][index].id + '" method="post">{% csrf_token %}' +
+                        '<input hidden type="text" name="id" value="' + array[n][index].id + '">' +
+                        '<input hidden type="text" id="cantidad_calidad_' + array[n][index].id + '" name="cantidad" value="0">' +
+                        '<input hidden type="text" name="type" value="calidad">' +
+                        '<button onclick="evaluate_quality(' + array[n][index].id + ');" class="btn btn-primary">Calificar</button>' +
+                        '</form>\n' +
+                        '</div></div></div></div>' +
+                        '</div>'
+                    grilla = grilla + code + "</div>";
+                }
+            }
+            grilla = grilla + "</div>";
+            document.getElementById("assessment_body").innerHTML = grilla;
+        }
+    }
+
+    function remove_element_in_array(id, index) {
+        for(let i in array[index]){
+            if(array[index][i].id === id){
+                delete(array[index][i]);
+            }
+        }
+        for(let i in array[0]){
+            if(array[0][i].id === id){
+                delete(array[0][i]);
+                break;
+            }
+        }
+        let amount = Number(document.getElementById("info_amount_evaluations_text").innerText.split(' ')[0])-1;
+        document.getElementById("info_amount_evaluations").remove();
+        let code = '<div id="info_amount_evaluations" class="alert alert-primary d-flex align-items-center" role="alert">\n' +
+            '  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">\n' +
+            '  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>\n' +
+            '  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>\n' +
+            '</svg>' +
+            '  <div id="info_amount_evaluations_text">&nbsp;' +
+             amount + ' compras con evaluación pendiente ' +
+            '  </div>\n' +
+            '</div>';
+        document.getElementById("assessment_body").insertAdjacentHTML("afterbegin",code);
+    }
+
+    function evaluate_puntuality(n){
+        if(document.getElementById("cantidad_puntualidad_"+n).value === "0") {
+            if(document.getElementById("error_evaluation_puntuality_"+n) === null){
+                let code= '<div id="error_evaluation_puntuality_'+n+'" class="alert alert-danger" role="alert" style="margin-top: 10px"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">\n' +
+                '<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>\n' +
+                '</svg>&nbsp&nbsp No puedes evaluar con 0 estrellas</div>';
+                document.getElementById("div_stars_puntuality_"+n).insertAdjacentHTML("beforeend", code);
+            }
+        }
+        else{
+            fetch("",{
+                method:"POST",
+                body: new FormData(document.getElementById("form_puntuality_"+n)),
+                headers:{
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    "X-Requested-With": "XMLHttpRequest"
+                }}).then(function (response){
+                    return response.json();}).then(
+                        function (data){
+
+                        });
+            document.getElementById("button_evaluate_puntuality_"+n).remove();
+            document.getElementById("close_assessment_puntuality_"+n).click();
+            document.getElementById("footer_evaluation_"+n).insertAdjacentHTML("beforeend",'<div class="col-6"><p class="link-secondary">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">' +
+                '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
+                '<path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>' +
+                '</svg>&nbsp; Puntualidad evaluada</p></div>');
+            remove_element_in_array(n,1);
+        }
+    }
+
+    function evaluate_quality(n){
+        if(document.getElementById("cantidad_calidad_"+n).value === "0"){
+            if(document.getElementById("error_evaluation_quality_"+n) === null){
+                let code= '<div id="error_evaluation_quality_'+n+'" class="alert alert-danger" role="alert" style="margin-top: 10px"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">\n' +
+                '<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>\n' +
+                '</svg>&nbsp&nbsp No puedes evaluar con 0 estrellas</div>';
+                document.getElementById("div_stars_quality_"+n).insertAdjacentHTML("beforeend", code);
+            }
+        }
+        else{
+            fetch("",{
+                method:"POST",
+                body: new FormData(document.getElementById("form_quality_"+n)),
+                headers:{
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    "X-Requested-With": "XMLHttpRequest"
+                }}).then(function (response){
+                    return response.json();}).then(
+                        function (data){
+
+                        });
+            document.getElementById("button_evaluate_quality_"+n).remove();
+            document.getElementById("close_assessment_quality_"+n).click();
+            document.getElementById("footer_evaluation_"+n).insertAdjacentHTML("afterbegin",'<div class="col-6"><p class="link-primary">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">' +
+                '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
+                '<path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>' +
+                '</svg>&nbsp; Calidad evaluada</p></div>');
+            remove_element_in_array(n,2);
+        }
+
+    }
+
+    function remove_evaluations(n){
+        for(let i =0; i<3; i++){
+            if(i !== n){
+                $("#evaluation_"+evaluations_ids[i]).remove();
+            }
+        }
+    }
+
+    function pending_purchases(n) {
+        let count = 0;
+        for(let index in array[n]){
+            if(array[n][index] !== undefined){
+                count = count + 1;
+            }
+        }
+        return count;
+    }
+
+    function change_item_selected(n){
+        //remove_evaluations(n);
+        add_evaluative_letter(n);
+        let amount = pending_purchases(n);
+        let code = '<div id="info_amount_evaluations" class="alert alert-primary d-flex align-items-center" role="alert">\n' +
+            '  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">\n' +
+            '  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>\n' +
+            '  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>\n' +
+            '</svg>' +
+            '  <div id="info_amount_evaluations_text">&nbsp;' +
+             amount + ' compras con evaluación pendiente ' +
+            '  </div>\n' +
+            '</div>';
+        document.getElementById("assessment_body").insertAdjacentHTML("afterbegin",code);
+        for(let i=0; i<3; i++){
+            if(i === n){
+                document.getElementById(evaluations_ids[i]).classList.add("active");
+                document.getElementById(evaluations_ids[i]).classList.remove("bg-light");
+                document.getElementById(evaluations_ids[i]).classList.remove("bg-opacity-100");
+            }
+            else{
+                document.getElementById(evaluations_ids[i]).classList.remove("active");
+                document.getElementById(evaluations_ids[i]).classList.add("bg-light");
+                document.getElementById(evaluations_ids[i]).classList.add("bg-opacity-100");
+            }
+        }
+    }
+</script>
+
+{% endblock %}
+
