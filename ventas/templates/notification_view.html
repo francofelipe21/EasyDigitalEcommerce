@@ -1,0 +1,640 @@
+{% extends "appCentral/padre.html"%}
+{% load static %}
+{% block content %}
+<h2 id="main_title" style="text-align: center; margin-top: 10px">Ventana de notificaciones</h2>
+
+<div class="accordion" id="requests" style="width: 100%; margin-bottom: 5%">
+    <div class="row" style="margin:3%">
+        <div class="col-md-4">
+            <div class="accordion-item">
+                {% if client %}
+            <button onclick="remove_badge('badge_total_purchase_requests')" class="accordion-button collapsed bg-primary bg-opacity-25" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePurchase" aria-expanded="true" aria-controls="collapsePurchase">
+                <h4 class="accordion-header" id="headingOne">
+                    Notificaciones de compra
+                </h4>
+                {% if total_purchase_requests > 0 %}&nbsp;&nbsp;
+                <span id="badge_total_purchase_requests" class="badge bg-primary rounded-pill">{{total_purchase_requests}}</span>
+                {% endif %}
+            </button>
+                <div id="collapsePurchase" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#requests">
+                    <div class="accordion-body bg-primary bg-opacity-25">
+                        <div class="list-group" >
+                            <!---->
+                            <button id="sent_purchase_request" onclick="show_purchase_request();" class="list-group-item list-group-item-action bg-light" aria-current="true">
+                                <h5 class="mb-1">
+                                    Aún no respondidas
+                                </h5>
+                                <small id="second_small_sent_purchase_request" class="text-muted"></small>
+                            </button>
+                            <button onclick="show_accepted_purchase_request()" id="accepted_purchase_request" href="#" class="list-group-item list-group-item-action bg-light">
+                                <form onsubmit="return false;" id="accepted_purchase_requests_form" method="post">{% csrf_token %}<input hidden type="text" name="type_view" value="accepted_purchase_requests"></form>
+                                <h5 class="mb-1">
+                                    Aceptadas
+                                    {% if number_accepted_purchase_request > 0 %}&nbsp;&nbsp;
+                                    <span id="badge_accepted_purchase_requests" class="badge bg-primary rounded-pill">{{number_accepted_purchase_request}}</span>
+                                    {% endif %}
+                                </h5>
+                                <small id="second_small_accepted_purchase_request" class="text-muted" style="margin-right: 0px">{{time_last_accepted_purchase_request}}</small>
+                            </button>
+                            <button id="rejected_purchase_request" onclick="show_rejected_purchase_request()" class="list-group-item list-group-item-action bg-light">
+                                <form onsubmit="return false;" id="rejected_purchase_requests_form" method="post">{% csrf_token %}<input hidden type="text" name="type_view" value="rejected_purchase_requests"></form>
+                                <h5 class="mb-1">
+                                    Rechazadas
+                                    {% if number_rejected_purchase_request > 0 %}&nbsp;&nbsp;
+                                    <span id="badge_rejected_purchase_requests" class="badge bg-primary rounded-pill">{{number_rejected_purchase_request}}</span>
+                                    {% endif %}
+                                </h5>
+                                <small id="second_small_rejected_purchase_request" style="text-align: right" class="text-muted">{{time_last_rejected_purchase_request}}</small>
+                            </button>
+                            <button onclick="show_conditionated_purchase_request()" id="conditionated_purchase_request" class="list-group-item list-group-item-action bg-light">
+                                <form onsubmit="return false;" id="proposal_purchase_requests_form" method="post">{% csrf_token %}<input hidden type="text" name="type_view" value="proposal_purchase_requests"></form>
+                                <h5 class="mb-1">
+                                    Sujetas a condiciones
+                                    {% if number_proposal_purchase_request > 0 %}&nbsp;&nbsp;
+                                    <span id="badge_proposal_purchase_requests" class="badge bg-primary rounded-pill">{{number_proposal_purchase_request}}</span>
+                                    {% endif %}
+                                </h5>
+                                <small id="second_small_conditionated_purchase_request" class="text-muted">{{time_last_proposal_purchase_request}}</small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if provider %}
+                <button onclick="remove_badge('badge_total_sale_requests')" class="accordion-button collapsed bg-primary bg-opacity-25" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSell" aria-expanded="true" aria-controls="collapseSell">
+                    <h4 class="accordion-header" id="headingTwo">
+                        Notificaciones de ventas
+                    </h4>
+                    {% if total_sale_requests > 0 %}&nbsp;&nbsp;
+                    <span id="badge_total_sale_requests" class="badge bg-primary rounded-pill">{{total_sale_requests}}</span>
+                    {% endif %}
+                </button>
+                <div id="collapseSell" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#requests">
+                    <div class="accordion-body bg-primary bg-opacity-25">
+                        <div class="list-group" >
+                            <button id="sale_request" onclick="show_sale_request()" class="bg-light list-group-item list-group-item-action" aria-current="true">
+                                <form onsubmit="return false;" id="sale_requests_form" method="post">{% csrf_token %}<input hidden type="text" name="type_view" value="sale_requests"></form>
+                                <h5 class="mb-1">
+                                    Recibidas
+                                    {% if number_sale_request > 0 %}&nbsp;&nbsp;
+                                    <span id="badge_sale_requests" class="badge bg-primary rounded-pill">{{number_sale_request}}</span>
+                                    {% endif %}
+                                </h5>
+                                <small id="second_small_sale_request" class="text-muted">{{time_last_sale_request}}</small>
+                            </button>
+                            <button id="accepted_sale_request" onclick="show_accepted_sale_request()" class="bg-light list-group-item list-group-item-action">
+                                <form onsubmit="return false;" id="accepted_sale_requests_form" method="post">{% csrf_token %}<input hidden type="text" name="type_view" value="accepted_sale_requests"></form>
+                                <h5 class="mb-1">
+                                    Aceptadas
+                                    {% if number_accepted_sale_request > 0 %}&nbsp;&nbsp;
+                                    <span id="badge_accepted_sale_requests" class="badge bg-primary rounded-pill">{{number_accepted_sale_request}}</span>
+                                    {% endif %}
+                                </h5>
+                                <small id="second_small_accepted_sale_request" class="text-muted">{{time_last_accepted_sale_request}}</small>
+                            </button>
+                            <button id="rejected_sale_request" onclick="show_rejected_sale_request()" class="bg-light list-group-item list-group-item-action">
+                                <form onsubmit="return false;" id="rejected_sale_requests_form" method="post">{% csrf_token %}<input hidden type="text" name="type_view" value="rejected_sale_requests"></form>
+                                <h5 class="mb-1">
+                                    Rechazadas
+                                    {% if number_rejected_sale_request > 0 %}&nbsp;&nbsp;
+                                    <span id="badge_rejected_sale_requests" class="badge bg-primary rounded-pill">{{number_rejected_sale_request}}</span>
+                                    {% endif %}
+                                </h5>
+                                <small id="second_small_rejected_sale_request" class="text-muted">{{time_last_rejected_sale_request}}</small>
+                            </button>
+                            <button id="conditionated_sale_request" onclick="show_conditionated_sale_request()" class="bg-light list-group-item list-group-item-action">
+                                <h5 class="mb-1">Sujetas a condiciones</h5>
+                                <small id="second_small_conditionated_sale_request" class="text-muted"></small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-8 bg-light" id="notifications_body" style="height: 700px;overflow: auto">
+        </div>
+    </div>
+</div>
+{{ purchase_requests|json_script:"purchase_requests" }}
+{{ accepted_purchase_requests|json_script:"accepted_purchase_requests" }}
+{{ rejected_purchase_requests|json_script:"rejected_purchase_requests" }}
+{{ proposal_interval_purchase|json_script:"proposal_interval_purchase" }}
+{{ sale_requests|json_script:"sale_requests" }}
+{{ accepted_sale_requests|json_script:"accepted_sale_requests" }}
+{{ rejected_sale_requests|json_script:"rejected_sale_requests" }}
+{{ proposal_interval_sale|json_script:"proposal_interval_sale" }}
+
+<script src="{% static 'appCentral/js/shared_methods.js' %}" ></script>
+
+<script>
+    var ids_accordion_item=["sent_purchase_request", "second_small_sent_purchase_request", "accepted_purchase_request", "second_small_accepted_purchase_request","rejected_purchase_request","second_small_rejected_purchase_request", "conditionated_purchase_request", "second_small_conditionated_purchase_request", "sale_request", "second_small_sale_request", "accepted_sale_request", "second_small_accepted_sale_request", "rejected_sale_request","second_small_rejected_sale_request","conditionated_sale_request", "second_small_conditionated_sale_request"];
+    var notifications_ids=[];
+    var purchase_requests = JSON.parse(document.getElementById("purchase_requests").textContent);
+    var accepted_purchase_requests = JSON.parse(document.getElementById("accepted_purchase_requests").textContent);
+    var rejected_purchase_requests = JSON.parse(document.getElementById("rejected_purchase_requests").textContent);
+    var proposal_interval_purchase = JSON.parse(document.getElementById("proposal_interval_purchase").textContent);
+    var sale_requests = JSON.parse(document.getElementById("sale_requests").textContent);
+    var accepted_sale_requests = JSON.parse(document.getElementById("accepted_sale_requests").textContent);
+    var rejected_sale_requests = JSON.parse(document.getElementById("rejected_sale_requests").textContent);
+    var proposal_interval_sale = JSON.parse(document.getElementById("proposal_interval_sale").textContent);
+
+
+
+    function ChangeItemSelected(n){
+        for(let i=0; i<ids_accordion_item.length; i++){
+            if(i!=2*n && i!=2*n+1){
+                if(i % 2 == 0){
+                    document.getElementById(ids_accordion_item[i]).classList.remove("active");
+                    document.getElementById(ids_accordion_item[i]).classList.add("bg-light");
+                }
+                else{
+                    document.getElementById(ids_accordion_item[i]).classList.add("text-muted");
+                }
+            }
+            else{
+                if(i % 2 == 0){
+                    document.getElementById(ids_accordion_item[i]).classList.add("active");
+                    document.getElementById(ids_accordion_item[i]).classList.remove("bg-light");
+                }
+                else{
+                    document.getElementById(ids_accordion_item[i]).classList.remove("text-muted");
+                }
+            }
+        }
+    }
+
+    function show_conditionated_sale_request(){
+        remove_screen_notifications();
+        //requests=string_to_array("{{proposal_interval_sale|safe}}")
+        for (let index in proposal_interval_sale){
+            add_informative_card(proposal_interval_sale[index], "Cliente");
+        }
+        ChangeItemSelected(7);
+        report_number_requests(proposal_interval_sale);
+    }
+
+    function show_rejected_sale_request(){
+        fetch("",{
+        method:"POST",
+        body: new FormData(document.getElementById("rejected_sale_requests_form")),
+        headers:{
+            'X-CSRFToken': getCookie('csrftoken'),
+            "X-Requested-With": "XMLHttpRequest"
+        }
+        });
+        remove_badge('badge_rejected_sale_requests');
+        remove_screen_notifications();
+        //let requests = string_to_array("{{rejected_sale_requests|safe}}");
+        for (let index in rejected_sale_requests){
+            add_informative_card(rejected_sale_requests[index], "Cliente");
+        }
+        ChangeItemSelected(6);
+        report_number_requests(rejected_sale_requests);
+    }
+
+    function show_accepted_sale_request(){
+        fetch("",{
+        method:"POST",
+        body: new FormData(document.getElementById("accepted_sale_requests_form")),
+        headers:{
+            'X-CSRFToken': getCookie('csrftoken'),
+            "X-Requested-With": "XMLHttpRequest"
+        }
+        });
+        remove_badge('badge_accepted_sale_requests');
+        remove_screen_notifications();
+        //let requests = string_to_array("{{accepted_sale_requests|safe}}");
+        for (let index in accepted_sale_requests){
+            add_informative_card(accepted_sale_requests[index], "Cliente");
+        }
+        ChangeItemSelected(5);
+        report_number_requests(accepted_sale_requests);
+    }
+
+    function show_sale_request(){
+        fetch("",{
+        method:"POST",
+        body: new FormData(document.getElementById("sale_requests_form")),
+        headers:{
+            'X-CSRFToken': getCookie('csrftoken'),
+            "X-Requested-With": "XMLHttpRequest"
+        }
+        });
+        remove_badge('badge_sale_requests');
+        remove_screen_notifications();
+        //let requests = string_to_array("{{sale_requests|safe}}");
+        for (let index in sale_requests){
+            add_listener_information_card(sale_requests[index], "sale", "provider");
+        }
+        ChangeItemSelected(4);
+        report_number_requests(sale_requests);
+    }
+
+    function show_conditionated_purchase_request(){
+        fetch("",{
+        method:"POST",
+        body: new FormData(document.getElementById("proposal_purchase_requests_form")),
+        headers:{
+            'X-CSRFToken': getCookie('csrftoken'),
+            "X-Requested-With": "XMLHttpRequest"
+        }
+        });
+        remove_badge('badge_proposal_purchase_requests');
+        remove_screen_notifications();
+        //let requests = string_to_array("{{proposal_interval_purchase|safe}}");
+        for (let index in proposal_interval_purchase){
+            add_listener_information_card(proposal_interval_purchase[index],"purchase", "client");
+        }
+        ChangeItemSelected(3);
+        report_number_requests(proposal_interval_purchase);
+    }
+
+    function show_rejected_purchase_request(){
+        fetch("",{
+        method:"POST",
+        body: new FormData(document.getElementById("rejected_purchase_requests_form")),
+        headers:{
+            'X-CSRFToken': getCookie('csrftoken'),
+            "X-Requested-With": "XMLHttpRequest"
+        }
+        });
+        remove_badge('badge_rejected_purchase_requests');
+        remove_screen_notifications();
+        //let requests = string_to_array("{{rejected_purchase_requests|safe}}");
+        for (let index in rejected_purchase_requests){
+            add_informative_card(rejected_purchase_requests[index], "Proveedor");
+        }
+        ChangeItemSelected(2);
+        report_number_requests(rejected_purchase_requests);
+    }
+
+    function show_accepted_purchase_request(){
+        fetch("",{
+        method:"POST",
+        body: new FormData(document.getElementById("accepted_purchase_requests_form")),
+        headers:{
+            'X-CSRFToken': getCookie('csrftoken'),
+            "X-Requested-With": "XMLHttpRequest"
+        }
+        });
+        remove_badge('badge_accepted_purchase_requests');
+        remove_screen_notifications();
+        for (let index in accepted_purchase_requests){
+            add_informative_card(accepted_purchase_requests[index], "Proveedor")
+        }
+        ChangeItemSelected(1);
+        report_number_requests(accepted_purchase_requests);
+    }
+
+    function number_request(requests) {
+        let count = 0;
+        for(let index in requests){
+            if(requests[index] !== undefined){
+                count = count + 1;
+            }
+        }
+        return count;
+    }
+
+    function report_number_requests(requests) {
+        if(document.getElementById("number_notifications") !== null){
+            document.getElementById("number_notifications").remove();
+        }
+        let count = number_request(requests);
+        let code = '<div id="number_notifications" class="alert alert-info" role="alert">'+count+' solicitudes</div>';
+        document.getElementById("notifications_body").insertAdjacentHTML("afterbegin", code);
+    }
+
+    function show_purchase_request(){
+        remove_screen_notifications();
+        //let requests = string_to_array("{{purchase_requests|safe}}");
+        for (let index in purchase_requests){
+            add_informative_card(purchase_requests[index], "Proveedor");
+        }
+        ChangeItemSelected(0);
+        report_number_requests(purchase_requests);
+    }
+
+    function add_informative_card(request, type_entity){
+        notifications_ids.push("record_"+request.id)
+        let code='<div id="record_'+request.id+'" class="container bg-info bg-opacity-25" style="margin-bottom: 5%; margin-top: 20px; border-radius: 10px; border-style: groove">';
+        if((type_entity === "Proveedor" && request.client_viewed === false) || (type_entity === "Cliente" && request.provider_viewed === false)){
+            code = code + '<span class="badge rounded-pill bg-success">Nuevo</span>';
+        }
+        code = code + '<div class="row">' +
+            '<div class="col-8">';
+            if(type_entity === "Proveedor"){
+                code = code + '<div class="row"><div class="col-12"><b>'+type_entity+ ":</b> " + request.trade_name +'</div></div>';
+            }
+            else{
+                code = code + '<div class="row"><div class="col-12"><b>'+type_entity+ ":</b> " + request.client +'</div></div>';
+            }
+            code = code +
+            '<div class="row"><div class="col-6" style="overflow: auto"><b>Bien solicitado:</b> '+request.good_name +'</div><div class="col-6"><b>Cantidad:</b> '+request.amount+request.unit_measurement+'s</div></div>' +
+            '<div class="row" style="margin-top: 5px"><div class="col-12"><b>Fecha y hora solicitadas:</b> '+ request.datetime +'</div></div></div>';
+        code=code+'<div class="col-4"><div class="row">';
+        if(request.dispatch === true){
+            code=code+'<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">\n' +
+                '<path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>\n' +
+                '</svg></div>' +
+                '<div class="row">Compra con despacho a domicilio</div></div></div>' +
+                '<details><summary>Detalles de la ubicación:</summary><p><div class="row" style=" margin-top: 5px"><label style="text-align: center"><b>Ubicación:</b></label></div>' +
+                '<div class="row"><div class="col-12"><div id="map" style="width: 100%; height: 250px"></div></div></div></p>';
+            if (request.dispatch_help !== undefined && request.dispatch_help !== "" ){
+                code = code + '<div class="row"><div class="col-12"><b>Ayuda de despacho: </b> '+request.dispatch_help+' </div></div>';
+            }
+            code = code + '</details></div>';
+            document.getElementById("notifications_body").insertAdjacentHTML("afterbegin", code);
+            let lng= parseFloat(request.longitude);
+            let lat= parseFloat(request.latitude);
+            let marker = L.marker([lat, lng]);
+            let map=L.map('map').setView([lat, lng], 18);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'}).addTo(map);
+            marker.addTo(map);
+        }
+        else{
+            code=code+'<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" fill="currentColor" class="bi bi-shop" viewBox="0 0 16 16">\n' +
+                '  <path d="M2.97 1.35A1 1 0 0 1 3.73 1h8.54a1 1 0 0 1 .76.35l2.609 3.044A1.5 1.5 0 0 1 16 5.37v.255a2.375 2.375 0 0 1-4.25 1.458A2.371 2.371 0 0 1 9.875 8 2.37 2.37 0 0 1 8 7.083 2.37 2.37 0 0 1 6.125 8a2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.625V5.37a1.5 1.5 0 0 1 .361-.976l2.61-3.045zm1.78 4.275a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 1 0 2.75 0V5.37a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.255a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0zM1.5 8.5A.5.5 0 0 1 2 9v6h1v-5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v5h6V9a.5.5 0 0 1 1 0v6h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1V9a.5.5 0 0 1 .5-.5zM4 15h3v-5H4v5zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3zm3 0h-2v3h2v-3z"/>\n' +
+                '</svg>'
+                +'</div>' +
+                '<div class="row">Compra con retiro en tienda</div></div></div></div>';
+            document.getElementById("notifications_body").insertAdjacentHTML("afterbegin", code);
+        }
+
+    }
+
+    function add_listener_information_card(request, type_card, sender){
+        notifications_ids.push("record_"+request.id);
+        let code='<div id="record_'+request.id+'" class="container bg-info bg-opacity-25" style="margin-bottom: 5%; margin-top: 20px; border-radius: 10px; border-style: groove">';
+        if((sender === "client" && request.client_viewed === false) || (sender === "provider" && request.provider_viewed === false)){
+            code = code + '<span class="badge rounded-pill bg-success">Nuevo</span>';
+        }
+        code = code + '<div class="row"><div class="col-8">';
+        if(type_card === "purchase"){
+            code = code + '<div class="row"><div class="col-12"><b>Proveedor:</b> '+request.trade_name+'</div></div>';
+        }
+        else{
+            code = code + '<div class="row"><div class="col-12"><b>Cliente:</b> '+request.client +'</div></div>';
+        }
+            code = code + '<div class="row"><div class="col-6" style="overflow: auto"><b>Bien solicitado:</b> '+request.good_name+'</div><div class="col-6"><b>Cantidad: </b>'+request.amount+request.unit_measurement+'s</div></div>' +
+            '<div class="row" style="margin-top: 5px"><div class="col-12"><b>Fecha y hora solicitadas:</b> '+request.datetime +'</div></div>';
+        if(type_card === "purchase"){
+            code=code+'<div class="row"><div class="col-12"><b>Intervalo horario propuesto: </b>'+request.lower+' - '+request.higher+'</div></div>';
+        }
+        code=code+'</div><div class="col-4" ><div class="row">';
+        if(request.dispatch === true){
+            code=code+'<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">\n' +
+                '<path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>\n' +
+                '</svg></div>' +
+                '<div class="row">Compra con despacho a domicilio</div></div></div>'+
+                '<details><summary>Detalles de la ubicación de entrega</summary><p><div class="row" style=" margin-top: 5px"><label style="text-align: center"><b>Ubicación en el mapa:</b></label></div>'+
+                '<div class="row"><div class="col-12"><div id="map" style="width: 100%; height: 250px"></div></div></div></p>';
+                if(sender === "provider" && request.dispatch_help !== undefined && request.dispatch_help !== "" && request.dispatch === true){
+                    code=code+'<div class="row"><div class="col-12"><b>Ayuda de despacho: </b>'+request.dispatch_help+'</div></div>';
+                }
+                code = code + '</details><div class="row" style="height: auto; margin-top: 10px">' +
+                '<div class="col-4">'+
+                '<form id="form_accept_'+request.id+'" onsubmit="return false;" method="post">{% csrf_token %}\n' +
+                '<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#accept_'+request.id+'">Aceptar solicitud</button>\n' +
+                    '<div class="modal fade" id="accept_'+request.id+'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">\n' +
+                    '<div class="modal-dialog">\n' +
+                    '<div class="modal-content">\n' +
+                    '<div class="modal-header">\n' +
+                    '<h1 class="modal-title fs-5" id="exampleModalLabel">Confirmación</h1>' +
+                    '<button id="close_accept_'+request.id+'" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>' +
+                    '<div class="modal-body">\n' +
+                    '¿Estás seguro?' +
+                    '</div>\n' +
+                    '<div class="modal-footer">\n' +
+                    '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>\n' +
+                    '<button type="button" onclick="accept_sale('+request.id+')" class="btn btn-primary">Sí</button></div></div></div></div>'+
+                '<input type="text" hidden name="number_record" value="'+request.id+'" id="number_record_'+request.id+'">' +
+                '<input type="text" hidden name="type_submit" value="accept" id="type_submit_'+request.id+'">' +
+                '<input type="text" hidden name="sender" value="'+sender+'" id="sender_'+sender+'_'+request.id+'">' +
+                '</form>'+
+                '</div>';
+            if(type_card === "sale"){
+                code=code+'<div class="col-4">'+
+                    '<abbr title="Haz clic aquí para proponer un intervalo de llegada para la entrega a domicilio"><button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#proposeInterval_'+request.id+'">Proponer intervalo de llegada</button></abbr>'+
+                    '<div class="modal fade" id="proposeInterval_'+request.id+'" tabindex="-1" aria-labelledby="proposeIntervalLabel" aria-hidden="true">\n' +
+                    '<div class="modal-dialog">\n' +
+                    '<form id="form_proposal_'+request.id+'" onsubmit="return false;" method="post">{% csrf_token %}' +
+                    '<div class="modal-content">\n' +
+                    '<div class="modal-header">\n' +
+                    '<h5 class="modal-title" id="proposeIntervalLabel">Intervalo de llegada</h5>\n' +
+                    '<button id="close_proposal_'+request.id+'" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>\n' +
+                    '</div>\n' +
+                    '<div class="modal-body">\n' +
+                    '<div class="row">' +
+                    '<div class="col-3">Hora mínima de llegada:</div>' +
+                    '<div class="col-3"><input type="time" name="time_min" required></div>' +
+                    '<div class="col-3">Hora máxima de llegada:</div>' +
+                    '<div class="col-3"><input type="time" name="time_max" required></div></div>'+
+                    '<input type="text" name="number_record" id="number_record_'+request.id+'" hidden value="'+request.id+'">'+
+                    '<input type="text" name="type_submit" id="type_submit_'+request.id+'" hidden value="propose interval">'+
+                    '<input type="text" hidden name="sender" value="'+sender+'" id="sender_'+sender+'_'+request.id+'">' +
+                    '</div>\n' +
+                    '<div class="modal-footer">\n' +
+                    '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>\n' +
+                    '<button onclick="proposal_delivery('+request.id+')" class="btn btn-primary">Confirmar</button>\n' +
+                    '</div>\n' +
+                    '</div>\n' +
+                    '</form>' +
+                    '</div>\n' +
+                    '</div>'+
+                    '</div>';
+            }
+            code=code+'<div class="col-4">'+
+                '<form id="form_reject_'+request.id+'" onsubmit="return false;" method="post">{% csrf_token %}\n' +
+                '<button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reject_'+request.id+'">Rechazar solicitud</button>' +
+                '<div class="modal fade" id="reject_'+request.id+'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">\n' +
+                    '<div class="modal-dialog">\n' +
+                    '<div class="modal-content">\n' +
+                    '<div class="modal-header">\n' +
+                    '<h1 class="modal-title fs-5" id="exampleModalLabel">Confirmación</h1>' +
+                    '<button id="close_reject_'+request.id+'" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>' +
+                    '<div class="modal-body">\n' +
+                    '¿Estás seguro?' +
+                    '</div>\n' +
+                    '<div class="modal-footer">\n' +
+                    '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>\n' +
+                    '<button type="button" onclick="reject_sale('+request.id+')" class="btn btn-primary">Sí</button></div></div></div></div>'+
+                '<input type="text" hidden name="number_record" value="'+request.id+'" id="number_record_'+request.id+'">' +
+                '<input type="text" hidden name="type_submit" value="reject" id="type_submit_'+request.id+'">' +
+                '<input type="text" hidden name="sender" value="'+sender+'" id="sender_'+sender+'_'+request.id+'">' +
+                '</form>' +
+                '</div>'+
+                '</div>' +
+                '</div>';
+            document.getElementById("notifications_body").insertAdjacentHTML("afterbegin", code);
+            let lng= parseFloat(request.longitude);
+            let lat= parseFloat(request.latitude);
+            let marker = L.marker([lat, lng]);
+            let map=L.map('map').setView([lat, lng], 18);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'}).addTo(map);
+            marker.addTo(map);
+        }
+        else{
+            code=code+'<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" fill="currentColor" class="bi bi-shop" viewBox="0 0 16 16">\n' +
+                '  <path d="M2.97 1.35A1 1 0 0 1 3.73 1h8.54a1 1 0 0 1 .76.35l2.609 3.044A1.5 1.5 0 0 1 16 5.37v.255a2.375 2.375 0 0 1-4.25 1.458A2.371 2.371 0 0 1 9.875 8 2.37 2.37 0 0 1 8 7.083 2.37 2.37 0 0 1 6.125 8a2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.625V5.37a1.5 1.5 0 0 1 .361-.976l2.61-3.045zm1.78 4.275a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 1 0 2.75 0V5.37a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.255a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0zM1.5 8.5A.5.5 0 0 1 2 9v6h1v-5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v5h6V9a.5.5 0 0 1 1 0v6h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1V9a.5.5 0 0 1 .5-.5zM4 15h3v-5H4v5zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3zm3 0h-2v3h2v-3z"/>\n' +
+                '</svg>'
+                +'</div>' +
+                '<div class="row">Compra con retiro en tienda</div></div></div>' +
+                '<div class="row" style="height: 50px">' +
+                '<div class="col-6">'+
+                '<form id="form_accept_'+request.id+'" onsubmit="return false;" method="post">{% csrf_token %}\n' +
+                '<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#accept_'+request.id+'">Aceptar solicitud</button>\n' +
+                '<div class="modal fade" id="accept_'+request.id+'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">\n' +
+                    '<div class="modal-dialog">\n' +
+                    '<div class="modal-content">\n' +
+                    '<div class="modal-header">\n' +
+                    '<h1 class="modal-title fs-5" id="exampleModalLabel">Confirmación</h1>' +
+                    '<button id="close_accept_'+request.id+'" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>' +
+                    '<div class="modal-body">\n' +
+                    '¿Estás seguro?' +
+                    '</div>\n' +
+                    '<div class="modal-footer">\n' +
+                    '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>\n' +
+                    '<button type="button" onclick="accept_sale('+request.id+')" class="btn btn-primary">Sí</button></div></div></div></div>'+
+                '<input type="text" hidden name="number_record" value="'+request.id+'" id="number_record_'+request.id+'">' +
+                '<input type="text" hidden name="type_submit" value="accept" id="type_submit_'+request.id+'">' +
+                '<input type="text" hidden name="sender" value="'+sender+'" id="sender_'+sender+'_'+request.id+'">' +
+                '</form>'+
+                '</div>'+
+                '<div class="col-6">'+
+                '<form id="form_reject_'+request.id+'" onsubmit="return false;" method="post">{% csrf_token %}\n' +
+                '<button  class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reject_'+request.id+'">Rechazar solicitud</button>' +
+                '<div class="modal fade" id="reject_'+request.id+'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">\n' +
+                    '<div class="modal-dialog">\n' +
+                    '<div class="modal-content">\n' +
+                    '<div class="modal-header">\n' +
+                    '<h1 class="modal-title fs-5" id="exampleModalLabel">Confirmación</h1>' +
+                    '<button id="close_reject_'+request.id+'" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>' +
+                    '<div class="modal-body">\n' +
+                    '¿Estás seguro?' +
+                    '</div>\n' +
+                    '<div class="modal-footer">\n' +
+                    '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>\n' +
+                    '<button type="button" onclick="reject_sale('+request.id+')" class="btn btn-primary">Sí</button></div></div></div></div>'+
+                '<input type="text" hidden name="number_record" value="'+request.id+'" id="number_record_'+request.id+'">' +
+                '<input type="text" hidden name="type_submit" value="reject" id="type_submit_'+request.id+'">' +
+                '<input type="text" hidden name="sender" value="'+sender+'" id="sender_'+sender+'_'+request.id+'">' +
+                '</form>' +
+                '</div>'+
+                '</div>' +
+                '</div>';
+            document.getElementById("notifications_body").insertAdjacentHTML("afterbegin", code);
+        }
+    }
+
+    function proposal_delivery(n){
+        fetch("",{
+            method:"POST",
+            body: new FormData(document.getElementById("form_proposal_"+n)),
+            headers:{
+                'X-CSRFToken': getCookie('csrftoken'),
+                "X-Requested-With": "XMLHttpRequest"}});
+        document.getElementById("close_proposal_"+n).click();
+        let code='<div class="alert alert-info alert-dismissible fade show" role="alert" style="border-radius: 10px; margin-top: 10px">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">\n' +
+            '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>\n' +
+            '<path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>\n' +
+            '</svg>'+
+            '&nbsp; Acabaste de proponer un intervalo de llegada para la solicitud' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>';
+        document.getElementById("record_"+n).insertAdjacentHTML("afterend", code);
+        document.getElementById("record_"+n).remove();
+        update_arrays(n);
+    }
+
+    function update_arrays(n) {
+        for(let index in sale_requests){
+            if(sale_requests[index].id === n){
+                delete (sale_requests[index]);
+            }
+        }
+        for(let index in proposal_interval_purchase){
+            if(proposal_interval_purchase[index].id === n){
+                delete (proposal_interval_purchase[index]);
+            }
+        }
+    }
+
+    function accept_sale(n){
+        fetch("",{
+            method:"POST",
+            body: new FormData(document.getElementById("form_accept_"+n)),
+            headers:{
+                'X-CSRFToken': getCookie('csrftoken'),
+                "X-Requested-With": "XMLHttpRequest"}});
+        document.getElementById("close_accept_"+n).click();
+        let code='<div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px; margin-top: 10px">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">\n' +
+            '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>\n' +
+            '<path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>\n' +
+            '</svg>&nbsp; Acabaste de aceptar la solicitud' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>';
+        document.getElementById("record_"+n).insertAdjacentHTML("afterend", code);
+        document.getElementById("record_"+n).remove();
+        update_arrays(n);
+    }
+
+    function reject_sale(n){
+        fetch("",{
+            method:"POST",
+            body: new FormData(document.getElementById("form_reject_"+n)),
+            headers:{
+                'X-CSRFToken': getCookie('csrftoken'),
+                "X-Requested-With": "XMLHttpRequest"}});
+        document.getElementById("close_reject_"+n).click();
+        let code='<div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; margin-top: 10px">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">\n' +
+            '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>\n' +
+            '<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>\n' +
+            '</svg>'+
+            '&nbsp; Acabaste de rechazar la solicitud' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>';
+        document.getElementById("record_"+n).insertAdjacentHTML("afterend", code);
+        document.getElementById("record_"+n).remove();
+        update_arrays(n);
+    }
+
+    function remove_screen_notifications(){
+        for(let index in notifications_ids){
+            if(document.querySelector("#"+notifications_ids[index]) != null) {
+                document.querySelector("#"+notifications_ids[index]).remove();
+                delete notifications_ids[index];
+            }
+        }
+    }
+
+    function string_to_array(requests){
+        requests = requests.split("[");
+        array=[]
+        for (let i in requests){
+            request=requests[i].split("]")[0];
+            request=request.split(",");
+            for (let i in request){
+                request[i]=request[i].replace(/["']/g, "");
+                if(i!=7 && i!=0 && i!=1 && i!=10){
+                    request[i]=request[i].replace(/[ ]/g, "");
+                }
+            }
+            array.push(request);
+        }
+        return array;
+    }
+
+    function remove_badge(id){
+        if($("#"+id) != null){
+            $("#"+id).remove();
+        }
+    }
+</script>
+{% endblock %}

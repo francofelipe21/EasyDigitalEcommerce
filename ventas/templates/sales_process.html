@@ -1,0 +1,523 @@
+{% extends "appCentral/padre.html"%}
+{% load static %}
+{% block content %}
+
+<h2 style="text-align: center; margin-top: 5%; margin-bottom: 5%">Proceso de compra</h2>
+
+{% if phase == 1 %}
+<h3 style="text-align: center">1° Paso: Leer la información detallada sobre el bien</h3>
+{% else %}
+<h3 style="text-align: center">2° Paso: Determinar cantidad, lugar, fecha y hora</h3>
+{% endif %}
+<div class="container text-center" id="div_sales_process" style="background-color: #d7d8da ; border-radius: 20px; border-style: outset; overflow: auto; height: 500px">
+  {% if phase == 1 %}
+  <div class="progress">
+  <div class="progress-bar" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">33% completado</div>
+</div>
+  {% else %}
+  <form method="POST" id="form" class="needs-validation" novalidate>
+      {% csrf_token %}
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">66% completado</div>
+    </div>
+    {% endif %}
+    <div class="row" style="margin-bottom: 5%; text-align: left">
+      {% if good.image %}
+      <div class="col-md-6" style="text-align: center">
+        <h4><b> {{good.name}}</b></h4>
+        <img class="img-fluid rounded" src="{{good.image.url}}" style="margin-top: 10px;  width: 100%">
+      </div>
+      {% endif %}
+      {% if phase == 1 %}
+      <div class="col-md-6" style="text-align: center">
+        <h3>{{good.subcategory.category.type_good.name}} de
+        {% if shop.name != 'Tienda anónima' %}
+        <a  href="../tienda/?id={{shop.id}}">{{shop.name}}</a></h3>
+        {% else %}
+        la <a href="../tienda/?id={{shop.id}}">tienda de
+          {% if provider.first_name and provider.last_name %}
+          {{provider.first_name}} {{provider.last_name}}
+          {% elif not provider.first_name and provider.last_name %}
+          {{provider.last_name}}
+          {% elif provider.first_name and not provider.last_name %}
+          {{provider.first_name}}
+          {% endif %}
+      </a>
+        </h3>
+        {% endif %}
+        <h4><b>Precio:</b> ${{good.price}} por {{good.unit_measurement.name}}</h4>
+        {% if good.description %}
+        <div class="row">
+          <h4><b>Descripción: </b></h4>
+          <p>{{good.description}}</p>
+        </div>
+        {% endif%}
+        <!--
+        {% if has_schedule %}
+        <h4>Horario de atención:</h4>
+        <ul>
+          {% for item in schedule %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        <h4>Puntualidad de despacho:</h4>
+        {% if puntuality != "Sin evaluaciones" %}
+        <ul>
+          <li>
+            {% for star in puntuality_stars_array %}
+            {% if star %}
+            <span class="fa fa-star star star-checked"></span>
+            {% else %}
+            <span class="fa fa-star star"></span>
+            {% endif %}
+            {% endfor %}
+          </li>
+          {% for mark in puntuality %}
+          <li>{{mark}}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        {{puntuality}}
+        {% endif %}
+
+        -->
+        <div >
+        <h4><b>Calidad del {{good.subcategory.category.type_good.name}}</b></h4>
+        {% if quality != "Sin evaluaciones" %}
+          {% for star in quality_stars_array %}
+            {% if star %}
+            <span class="fa fa-star star star-checked"></span>
+            {% else %}
+            <span class="fa fa-star star"></span>
+            {% endif %}
+            {% endfor %}
+        <ul>
+          {% for mark in quality %}
+          <li>{{mark}}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        {{quality}}
+        {% endif %}
+        </div>
+        <div >
+        <h4><b>Puntualidad de entrega del {{good.subcategory.category.type_good.name}}</b></h4>
+        {% if puntuality != "Sin evaluaciones" %}
+          {% for star in puntuality_stars_array %}
+            {% if star %}
+            <span class="fa fa-star star star-checked"></span>
+            {% else %}
+            <span class="fa fa-star star"></span>
+            {% endif %}
+            {% endfor %}
+        <ul>
+          {% for mark in puntuality %}
+          <li>{{mark}}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        {{puntuality}}
+        {% endif %}
+        </div>
+        <h4><b>Información extra</b></h4>
+        <p style="margin-top: 15px; margin-bottom: 15px">{{requests_stats}}</p>
+        {% if good.allows_fraction %}
+        <p>Se puede vender una fracción del bien</p>
+        {% else %}
+        <p>No se puede vender una fracción del bien</p>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="col">
+        <div class="input-group" style="margin-top: 20px">
+          {% if good.allows_fraction %}
+          <label class="form-label" for="amount">Seleccione la cantidad de {{good.unit_measurement.name}}s:</label>
+          <input class="form-control" min="0.01" max="1000" step="0.01" name="amount" id="amount" type="number" required>
+          {% else %}
+          <label class="form-label" for="amount">Seleccione la cantidad de {{good.unit_measurement.name}}s:</label>
+          <input class="form-control" max="1000" min="0" step="1" name="amount" id="amount" type="number" required>
+          {% endif %}
+          <div class="valid-feedback">
+            ¡Bien hecho!
+          </div>
+          <div class="invalid-feedback">
+            No ha seleccionado una cantidad válida. No puede seleccionar más de 1000 unidades.
+          </div>
+        </div>
+        <div class="input-group" style="margin-top: 20px">
+          <label class="form-label">Seleccione el día de entrega del bien:</label>
+          <input min="{{current_date}}" onchange="set_min_time()" class="form-control" id="date" name="date" type="date" required>
+          <div class="valid-feedback">
+            ¡Bien hecho!
+          </div>
+          <div class="invalid-feedback">
+            No ha seleccionado una fecha válida
+          </div>
+        </div>
+        <div class="input-group" style="margin-top: 20px">
+          <label class="form-label">Seleccione la hora de la entrega del bien:</label>
+          <input class="form-control" name="hour" id="hour" type="time" required >
+          <div id="success_hour" class="valid-feedback">
+            ¡Bien hecho!
+          </div>
+          <div id="error_hour" class="invalid-feedback">
+            No ha seleccionado una hora válida. Si seleccionó el mismo día, la diferencia entre la hora actual y solicitada debe ser de al menos 10 minutos.
+          </div>
+        </div>
+        {% if shop.locations %}
+        <label class="form-label " style="margin-top: 20px">Seleccione un tipo de entrega:</label>
+        <div class="input-group" id="type_delivery">
+          {% if good.takeable %}
+          <div class="form-check">
+          <input onclick="removeTypeDispatch()" class="form-check-input" type="radio" name="local-dispatch" value="local" id="local" required>
+          <label class="form-label" for="local">
+            Retirar en el local del proveedor
+          </label>
+        </div>
+          {% endif %}
+          {% if good.deliverable %}
+        <div class="form-check" >
+          <input onclick="addTypeDispatch()" class="form-check-input" type="radio" name="local-dispatch" value="dispatch" id="dispatch" required>
+          <label class="form-label" for="dispatch">
+          {% if good.subcategory.category.type_good.name == "Servicio" %}
+            Solicitar ejecución del servicio en domicilio.
+          {% else %}
+            Solicitar entrega a domicilio.
+            {% endif %}
+          </label>
+        </div>
+          {% endif %}
+        </div>
+      {% elif not shop.locations and user.is_authenticated and user.location.x != 0 and user.location.y != 0 %}
+        <p style="text-align: center"><b>El {{good.subcategory.category.type_good.name}} sólo se
+          {% if good.subcategory.category.type_good.name == "Servicio" %}
+          lleva a cabo en domicilio
+          {% else %}
+          entrega en domicilio
+          {% endif %}
+          personal.
+        </b></p>
+      <div style="margin-top: 20px">
+        <label class="form-label">Seleccionar lugar:</label>
+        <div class="input-group">
+          <div class="form-check">
+            <input onclick="add_optional_question();" class="form-check-input" type="radio" value="personal" name="personal-other" id="personal" required>
+            <label class="form-label" for="personal">
+            Domicilio personal
+            </label>
+          </div>&nbsp;&nbsp;&nbsp;&nbsp;
+        <div class="form-check" >
+          <input onclick="show_map_other_location()" class="form-check-input" type="radio" value="other" name="personal-other" id="other" required>
+          <label class="form-label" for="other">
+            Otro domicilio
+          </label></div></div>
+        <div class="valid-feedback">
+          ¡Bien hecho!
+        </div>
+        <div class="invalid-feedback">
+          Falta responder aquí
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+    {% if not shop.locations and user.is_authenticated and user.location.x == 0 and user.location.y == 0 and phase == 2 %}
+      <div class="col col-md-2" style="text-align: center; width: 100%; margin-top: 20px">
+        <p style="text-align: center"><b>El {{good.subcategory.category.type_good.name}} sólo se
+          {% if good.subcategory.category.type_good.name == "Servicio" %}
+          lleva a cabo en domicilio
+          {% else %}
+          entrega en domicilio
+          {% endif %}
+          personal.
+        </b></p>
+      <div class="mb-3" id="div_help_location">
+        <label for="help_location" class="form-label">Ayuda opcional para encontrar domicilio</label>
+        <textarea class="form-control" name="help_location" id="help_location" rows="3" placeholder="Ejemplo: casa número 1234 con rejas verdes"></textarea>
+      </div>
+      <p>Escoja la ubicación de despacho en el mapa</p>
+      <div id="map" style="width: 100%"></div>
+      <input type="text" hidden id="latitude" name="latitude"><input type="text" hidden id="longitude" name="longitude">
+        <div id="success_other_location" style="color: green"></div><div id="error_other_location" style="color: red"></div>
+    </div>
+    {% endif %}
+
+  </div>
+    {% if phase == 2%}
+    <button id="request_good" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#sale_confirmation">Solicitar bien</button>
+  <div class="modal fade" id="sale_confirmation" tabindex="-1" aria-labelledby="sale_confirmation" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"> Confirmación </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Está seguro?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Sí</button>
+      </div>
+    </div>
+  </div>
+</div></form>
+    {% endif %}
+</div>
+{% if phase == 1 %}
+<div class="btn-group" role="group" style="text-align: center; margin-bottom: 5%; margin-left: 40%; width: 20%">
+  <a href="/"><button type="button" class="btn btn-lg btn-outline-primary" >Atras</button>
+  </a>
+  <a href="/ventas/?good={{good.id}}&phase=2">
+    <button type="button" class="btn btn-lg btn-outline-primary" >Siguiente</button>
+  </a>
+
+</div>
+
+{% else %}
+<div class="btn-group" role="group" style="text-align: center;margin-left: 40%; width: 25%; margin-bottom: 5%; margin-top: 20px">
+    <a href="/"><button type="button" class="btn btn-lg btn-outline-primary">Cancelar solicitud</button>
+    </a>
+    <a href="/ventas/?good={{good.id}}&phase=1"><button type="button" class="btn btn-lg btn-outline-primary" >Atras</button></a>
+</div>
+
+{% endif %}
+
+<script>
+
+  function remove_other_location_map(){
+    if(document.getElementById("other_location_map") != null){
+      $("#other_location_map").remove();
+      $("#latitude").remove();
+      $("#longitude").remove();
+      $("#error_other_location").remove();
+      $("#success_other_location").remove();
+    }
+  }
+
+  function show_map_other_location(){
+    add_optional_question();
+    let iframe_map='<iframe id="other_location_map" src="leaflet_other_location_map" width=100% height= "500px" style="max-width: 100%; max-height: 90vh; box-sizing: border-box;"></iframe><input type="text" hidden id="latitude" name="latitude"><input type="text" hidden id="longitude" name="longitude"><div id="success_other_location" style="color: green"></div><div id="error_other_location" style="color: red"></div>';
+    if(document.getElementById("other_location_map") == null){
+      document.getElementById("request_good").insertAdjacentHTML("beforebegin",iframe_map);
+    }
+  }
+
+  function removeTypeDispatch(){
+    if(document.getElementById("div_type_dispatch") != null){
+      $("#div_type_dispatch").remove();
+      remove_other_location_map();
+    }
+    if(document.getElementById("div_help_location") != null){
+      $("#div_help_location").remove();
+    }
+    if ("{{user.location.x}}" === "0,0" && "{{user.location.y}}" === "0,0"){
+      remove_other_location_map();
+    }
+  }
+
+  function addTypeDispatch() {
+    if (document.getElementById("div_type_dispatch") == null ) {
+      if("{{user.location.x}}" != "0,0" || "{{user.location.y}}" != "0,0"){
+        let code = '<div id="div_type_dispatch" style="margin-top: 20px">\n' +
+              '<label class="form-label">Seleccionar lugar:</label>\n' +
+              '<div class="input-group"><div class="form-check">\n' +
+              '<input value="personal" onclick="add_optional_question();" class="form-check-input" type="radio" name="personal-other" id="personal" required>\n' +
+              '<label class="form-label" for="personal">\n' +
+              'Domicilio personal\n' +
+              '</label>\n' +
+              '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
+              '<div class="form-check" >\n' +
+              '<input value="other" onclick="show_map_other_location();" class="form-check-input" type="radio" name="personal-other" id="other">\n' +
+              '<label class="form-label" for="other">\n' +
+              'Otro domicilio' +
+              '</label></div></div></div>';
+        document.getElementById("type_delivery").insertAdjacentHTML("afterend", code);
+      }
+      else{
+        show_map_other_location();
+      }
+    }
+  }
+</script>
+
+
+
+<!--
+{% if phase == 1 and shop.locations %}
+<script>
+    var ProviderIcon = L.Icon.extend({
+    options: {
+        iconUrl: '../static/appCentral/images/proveedor.png',
+        iconSize:     [30, 30],
+        iconAnchor:   [15, 15],
+        popupAnchor:  [0, -10]
+    }
+});
+  locations = JSON.parse("{{locations}}") ;
+  var lng= -70.653510;
+  var lat=  -33.443668;
+var map=L.map('map').setView([lat, lng], 9);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'}).addTo(map);
+for (let i=0; i< locations.length; i=i+2){
+    geo_json={
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [locations[i],locations[i+1]]
+      }
+    }
+    L.geoJSON(geo_json, {
+               pointToLayer: function (feature, latlng) {
+                   return L.marker(latlng, {icon: new ProviderIcon()});
+		}
+	}).addTo(map);
+  }
+</script>
+{% endif %}-->
+
+{% if not shop.locations and user.is_authenticated and user.location.x == 0 and user.location.y == 0 and phase == 2 %}
+<script>
+  var lng= -70.653510;
+  var lat=  -33.443668;
+  var map=L.map('map').setView([lat, lng], 13);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'}).addTo(map);
+
+navigator.geolocation.getCurrentPosition(function(position) {
+    lat =  position.coords.latitude;
+    lng = position.coords.longitude;
+	L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'}).addTo(map);
+    map.setView([lat, lng], 18);
+	map.on('click', function (e){
+		for(var key in map._layers){
+			if (key != "25" && key != "44"){
+				map.removeLayer(map._layers[key]);
+			}
+		}
+		lat=e.latlng.lat;
+		lng=e.latlng.lng;
+		marker_actual = L.marker([lat, lng]);
+		writeCustomSearchCoordinatedFromMap(lat,lng);
+		marker_actual.addTo(map);
+
+	})}
+    ,
+	function(err) {
+    console.error(err);
+	L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'}).addTo(map);
+	map.setView([lat, lng], 18);
+	map.on('click', function (e){
+		for(var key in map._layers){
+			if (key != "25" && key != "44"){
+				map.removeLayer(map._layers[key]);
+			}
+		}
+		lat=e.latlng.lat;
+		lng=e.latlng.lng;
+		marker_actual = L.marker([lat, lng]);
+		writeCustomSearchCoordinatedFromMap(lat,lng);
+		marker_actual.addTo(map);
+	})
+});
+
+function writeCustomSearchCoordinatedFromMap(lat, lng){
+	document.querySelector("#latitude").value = lat;
+	parent.document.querySelector("#longitude").value = lng;
+}
+</script>
+{% endif %}
+
+<script>
+  function show_erros() {
+    let errors_array = [];
+    if (document.getElementById("amount").value.length === 0) {
+      errors_array.push("Debe escoger una cantidad");
+    }
+    if (document.getElementById("date").value.length === 0) {
+      errors_array.push("Debe escoger una fecha");
+    }
+    if (document.getElementById("hour").value.length === 0) {
+      errors_array.push("Debe escoger una hora");
+    }
+    if (errors_array.length > 0) {
+      let code = "<ul>";
+      for (let index in errors_array) {
+        code = code + "<li>" + errors_array[index] + "</li>";
+      }
+      code = code + "</ul>";
+      code = '<div id="report_errors" style="position: absolute; bottom: 0" class="alert alert-danger alert-dismissible fade show" role="alert">' +
+              '<svg  xmlns="http://www.w3.org/2000/svg" style="display: none;">' +
+              '<symbol id="exclamation-triangle-fill" viewBox="0 0 16 16">\n' +
+              '<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>\n' +
+              '</symbol></svg>' +
+              '<div class="alert alert-danger d-flex align-items-center" role="alert">' +
+              '<svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>' +
+              code + '</div>' +
+              '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+      document.getElementById("form").insertAdjacentHTML("beforeend", code);
+    }
+  }
+
+  // Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false || (document.getElementById("longitude") !==  null && document.getElementById("longitude").value.length === 0)) {
+          event.preventDefault();
+          event.stopPropagation();
+          show_erros();
+          if(document.getElementById("longitude") !==  null){
+            if(document.getElementById("longitude").value.length === 0){
+              document.getElementById("success_other_location").innerHTML="";
+              document.getElementById("error_other_location").innerHTML="Debe indicar su ubicación antes de solicitar";
+            }
+            else{
+              document.getElementById("error_other_location").innerHTML="";
+              document.getElementById("success_other_location").innerHTML="¡Bien hecho!";
+            }
+          }
+
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+
+function set_min_time(){
+  if(document.getElementById("date").value === "{{current_date}}"){
+    let min_hour = "{{min_hour}}";
+    min_hour = Number(min_hour.split(":")[0])*60 + Number(min_hour.split(":")[1]) + 10;
+    min_hour = parseInt(Number(min_hour/60)).toString()  + ":"  + parseInt(Number(min_hour % 60)).toString() + ":00";
+    if(min_hour.length <8){
+      min_hour = "0" + min_hour;
+    }
+    document.getElementById("hour").min=min_hour;
+  }
+  else{
+    document.getElementById("hour").min="00:00:00";
+  }
+}
+
+function add_optional_question() {
+  remove_other_location_map();
+  if (document.getElementById("div_help_location") === null) {
+    let code = '<div class="mb-3" id="div_help_location">\n' +
+            '  <label for="help_location" class="form-label">Ayuda opcional para encontrar domicilio</label>\n' +
+            '  <textarea class="form-control" name="help_location" id="help_location" rows="3" placeholder="Ejemplo: casa número 1234 con rejas verdes"></textarea>\n' +
+            '</div>';
+    document.getElementById("request_good").insertAdjacentHTML("beforebegin", code);
+  }
+}
+</script>
+{% endblock %}
