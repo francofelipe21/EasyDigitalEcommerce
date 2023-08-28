@@ -1,0 +1,197 @@
+{% extends "appCentral/padre.html"%}
+{% load static %}
+{% block content %}
+
+<div class="container bg-primary bg-opacity-25" style="border-radius: 20px; alignment: center; margin-top: 10px; border-style: double; text-align: center">
+    <h3><b>{{shop.name}}</b></h3>
+    <details >
+          <summary >
+        Integrantes
+      </summary>
+        <p >
+      <div class="row" style="margin: 15px">
+      <div class="col-md-4">
+        <ol>
+          <b>Nombres:</b>
+          {% for provider in providers %}
+          <li>{{provider.first_name}} {{provider.last_name}}</li>
+          {% endfor %}
+        </ol>
+      </div>
+      <div class="col-md-4">
+        <ol>
+          <b>Correos electrónicos:</b>
+          {% for provider in providers %}
+          <li>{{provider.email}}</li>
+          {% endfor %}
+        </ol>
+      </div>
+      <div class="col-md-4">
+        <ol>
+          <b>Números de contacto:</b>
+          {% for provider in providers %}
+          <li>{{provider.phonenumber}}</li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+      </p>
+    </details>
+    <div class="row">
+      {% if shop.has_schedule %}
+      <div class="col" style="margin: 15px">
+    <details>
+          <summary>
+              Horario de atención
+          </summary>
+          <p>
+      {% for day in shop.schedule %}
+            {{day}}<br>
+      {% endfor %}
+          </p>
+      </details>
+      </div>
+    {% endif %}
+    <div class="col" style="margin: 15px">
+      <details>
+        <summary>Calidad de lo ofrecido</summary>
+        <p>
+          {% for star in shop.stars_quality%}
+          {% if star %}
+          <span class="fa fa-star star star-checked"></span>
+          {% else%}
+          <span class="fa fa-star star"></span>
+          {% endif %}
+          {% endfor %}
+          <br>
+          {% for item in shop.quality %}
+          {{item}}<br>
+          {% endfor %}
+        </p>
+      </details>
+    </div>
+      <div class="col" style="margin: 15px">
+      <details>
+        <summary>Puntualidad de llegada</summary>
+        <p>
+          {% for star in shop.stars_puntuality%}
+          {% if star %}
+          <span class="fa fa-star star star-checked"></span>
+          {% else%}
+          <span class="fa fa-star star"></span>
+          {% endif %}
+          {% endfor %}
+          <br>
+          {% for item in shop.puntuality %}
+          {{item}}<br>
+          {% endfor %}
+        </p>
+      </details>
+    </div>
+    </div>
+    {% if shop.has_office %}
+  <div class="row" style="margin: 15px">
+    <details >
+      <summary>Ubicación/es de la/s tienda/s</summary>
+      <div id="map" style="width: 100%; height: 300px"></div>
+    </details>
+  </div>
+
+    {% endif %}
+  </div>
+
+
+<div class="container" style="margin-top: 5%; margin-bottom: 5%">
+  {% for good in goods %}
+<div class="card mb-3 bg-light" style="max-width: 100%;">
+  <div class="row g-0">
+    <div class="col-md-4">
+      {% if good.image %}
+      <img src="{{good.image}}" class="img-fluid rounded-start" alt="...">
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      <div class="card-body">
+        <h3 class="card-title" style="text-align: center"><b>{{good.name}}</b></h3>
+        <p class="card-text"><b>Precio:</b> ${{good.price}} el {{good.unit_measurement.name}}</p>
+        {% if good.description %}
+        <p class="card-text"><b>Descripción:</b> {{good.description}}</p>
+        {% endif %}
+        {% if good.has_mark %}
+        <p class="card-text">
+          <b>Calidad:</b> {{good.mark}}
+          {% for star in good.stars %}
+          {% if star %}
+          <span class="fa fa-star star star-checked"></span>
+          {% else %}
+          <span class="fa fa-star star"></span>
+          {% endif %}
+          {% endfor %}
+        </p>
+        {% else %}
+        <p class="card-text"><i class="text-muted"><span class="fa fa-star star"></span>No ha sido evaluado este {{good.type_good}}</i> </p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-2">
+        {% if not user.is_authenticated or user.type_user.0 != 1 %}
+      <a class="btn btn-lg btn-primary" onclick="AvisarInicioSesion()" href="#" style="user-select: none; text-decoration: none; margin: 10px" >
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-coin" viewBox="0 0 16 16">
+          <path d="M5.5 9.511c.076.954.83 1.697 2.182 1.785V12h.6v-.709c1.4-.098 2.218-.846 2.218-1.932 0-.987-.626-1.496-1.745-1.76l-.473-.112V5.57c.6.068.982.396 1.074.85h1.052c-.076-.919-.864-1.638-2.126-1.716V4h-.6v.719c-1.195.117-2.01.836-2.01 1.853 0 .9.606 1.472 1.613 1.707l.397.098v2.034c-.615-.093-1.022-.43-1.114-.9H5.5zm2.177-2.166c-.59-.137-.91-.416-.91-.836 0-.47.345-.822.915-.925v1.76h-.005zm.692 1.193c.717.166 1.048.435 1.048.91 0 .542-.412.914-1.135.982V8.518l.087.02z"/>
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="M8 13.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zm0 .5A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"/>
+        </svg>
+          Solicitar
+        </a>
+        {% else %}
+        <a class="btn btn-lg btn-primary" href="../ventas/?good={{good.id}}" style="user-select: none; text-decoration: none; margin: 10px" >
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-coin" viewBox="0 0 16 16">
+          <path d="M5.5 9.511c.076.954.83 1.697 2.182 1.785V12h.6v-.709c1.4-.098 2.218-.846 2.218-1.932 0-.987-.626-1.496-1.745-1.76l-.473-.112V5.57c.6.068.982.396 1.074.85h1.052c-.076-.919-.864-1.638-2.126-1.716V4h-.6v.719c-1.195.117-2.01.836-2.01 1.853 0 .9.606 1.472 1.613 1.707l.397.098v2.034c-.615-.093-1.022-.43-1.114-.9H5.5zm2.177-2.166c-.59-.137-.91-.416-.91-.836 0-.47.345-.822.915-.925v1.76h-.005zm.692 1.193c.717.166 1.048.435 1.048.91 0 .542-.412.914-1.135.982V8.518l.087.02z"/>
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="M8 13.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zm0 .5A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"/>
+        </svg>
+          Solicitar
+        </a>
+        {% endif %}
+    </div>
+    <div class="card-footer" style="background-position: bottom"><small class="text-muted">Fecha de ingreso: {{good.date_joined}}</small></div>
+  </div>
+</div>
+{% endfor %}
+</div>
+ <script src="../static/AppCentral/js/shared_methods.js"></script>
+<script>
+  var ProviderIcon = L.Icon.extend({
+    options: {
+      iconUrl: '../static/appCentral/images/proveedor.png',
+      iconSize:     [30, 30],
+      iconAnchor:   [15, 15],
+      popupAnchor:  [0, -10]
+    }});
+  longitudes = JSON.parse("{{shop.longitudes}}") ;
+  latitudes = JSON.parse("{{shop.latitudes}}") ;
+  var lng= -70.653510;
+  var lat=  -33.443668;
+  if(longitudes.length > 0){
+    lng = longitudes[0];
+    lat = latitudes[0];
+  }
+  var map=L.map('map').setView([lat, lng], 13);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'}).addTo(map);
+  for (let i=0; i< longitudes.length; i=i+1){
+    geo_json={
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [longitudes[i],latitudes[i]]
+      }
+    }
+    L.geoJSON(geo_json, {
+               pointToLayer: function (feature, latlng) {
+                   return L.marker(latlng, {icon: new ProviderIcon()});
+		}
+	}).addTo(map);
+  }
+</script>
+{% endblock %}

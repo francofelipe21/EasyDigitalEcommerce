@@ -1,0 +1,240 @@
+{% extends "appCentral/padre.html"%}
+{% load static %}
+{% block content %}
+
+<form id="form" enctype="multipart/form-data" method="post" class="needs-validation" style="width: 80%; margin-left: 10%" novalidate xmlns="http://www.w3.org/1999/html">
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-6 mb-3">{{form.name.label}}{{form.name}}
+      <div class="valid-feedback">
+        ¡Bien hecho!
+      </div>
+      <div id="error_id_name" class="invalid-feedback">
+      </div>
+    </div>
+    <div class="col-md-3 mb-3 custom-select" >
+      {{form.price.label}}{{form.price}}
+      <div class="valid-feedback">
+        ¡Bien hecho!
+      </div>
+      <div id="error_id_price" class="invalid-feedback">
+
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      {{form.image.label}}
+      {{form.image}}
+    <div id="error_id_image" class="invalid-feedback">
+
+    </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      {{form.deliverable.label}}
+      {{form.deliverable}}
+    </div>
+    <div class="col-md-6">
+      {{form.takeable.label}}
+      {{form.takeable}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label>Tipo de bien que oferta</label>
+      <select class="form-select" id="id_type" name="type">
+        <option value="-1"> Seleccione un tipo </option>
+        {% for type in type_good %}
+          <option value="{{type.id}}"> {{type.name}} </option>
+        {% endfor %}
+      </select>
+      <div class="valid-feedback">
+        ¡Bien hecho!
+      </div>
+      <div id="error_id_type" class="invalid-feedback">
+
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label>Categoría del bien que oferta</label>
+      <select class="form-select" id="id_category" name="category" required>
+        {% for category in categories %}
+          <option value="{{category.id}}" data-chained="{{category.type_good.id}}"> {{category.name}} </option>
+        {% endfor %}
+      </select>
+      <div class="valid-feedback">
+        ¡Bien hecho!
+      </div>
+      <div id="error_id_category" class="invalid-feedback">
+
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label>Subcategoría del bien que oferta</label>
+      <select class="form-select" id="id_subcategory" name="subcategory" required>
+        {% for subcategory in subcategories %}
+          <option value="{{subcategory.id}}" data-chained="{{subcategory.category.id}}"> {{subcategory.name}} </option>
+        {% endfor %}
+      </select>
+      <div class="valid-feedback">
+        ¡Bien hecho!
+      </div>
+      <div id="error_id_subcategory" class="invalid-feedback">
+
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label>Unidad de medida</label>
+      <select class="form-select" id="id_unit_measurement" name="unit_measurement">
+        {% for unit in units %}
+          <option value="{{unit.id}}" data-chained="{{unit.category.id}}"> {{unit.name}} </option>
+        {% endfor %}
+      </select>
+      <div class="valid-feedback">¡Bien hecho!</div>
+      <div class="invalid-feedback" id="error_id_unit_measurement"></div>
+    </div>
+    <div class="col-md-4 mb-3">
+      {{form.available.label}}
+      {{form.available}}
+      <div class="valid-feedback">¡Bien hecho!</div>
+      <div class="invalid-feedback" id="error_id_available"></div>
+    </div>
+    <div class="col-md-4 mb-3">
+      {{form.allows_fraction.label}}
+      {{form.allows_fraction}}
+      <div class="valid-feedback">¡Bien hecho!</div>
+      <div class="invalid-feedback" id="error_id_allows_fraction"></div>
+    </div>
+    <div class="col-md-12 mb-3">
+      {{form.description.label}}
+      {{form.description}}
+    </div>
+  </div>
+  <button class="btn btn-primary" style="margin-right: 0px; margin-bottom: 10px" type="submit">Añadir producto</button>
+</form>
+<!--
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+-->
+
+<script src="{% static 'appCentral/js/jquery/jquery.chained.js' %}"></script>
+
+      <script type="text/javascript">
+          $("#id_category").chained("#id_type");
+          $("#id_subcategory").chained("#id_category");
+          $("#id_unit_measurement").chained("#id_category");
+      </script>
+ <script>
+   var ids_errors_array = [];
+   var content_errors_array = [];
+
+   function check_boundaries() {
+     return name.length > 100 || name.length === 0 || price > 2147483647 || price.toString().length === 0 || document.getElementById("id_image").value.length ===0 || document.getElementById("id_type").value.length === 0 || document.getElementById("id_category").value.length === 0 || document.getElementById("id_subcategory").value.length === 0 || document.getElementById("id_unit_measurement").value.length === 0;
+   }
+
+   function detail_errors() {
+     let name = document.getElementById("id_name").value;
+     let price = Number(document.getElementById("id_price").value);
+       if(name.length > 100){
+         ids_errors_array.push("id_name")
+         content_errors_array.push("El nombre no puede tener más de 100 carácteres")
+       }
+       if(name.length === 0){
+         ids_errors_array.push("id_name")
+         content_errors_array.push("El nombre es obligatorio")
+       }
+
+       if(price > 2147483647){
+         ids_errors_array.push("id_price")
+         content_errors_array.push("El precio no puede superar los $2.147.483.647")
+       }
+       if( price === 0){
+         ids_errors_array.push("id_price")
+         content_errors_array.push("El precio es obligatorio")
+       }
+       if(document.getElementById("id_image").value.length === 0){
+         ids_errors_array.push("id_image");
+         content_errors_array.push("La imagen es obligatoria")
+       }
+       if(document.getElementById("id_type").value.length === 0){
+         ids_errors_array.push("id_type");
+         content_errors_array.push("El tipo de bien es obligatorio")
+       }
+       if(document.getElementById("id_category").value.length === 0){
+         ids_errors_array.push("id_category");
+         content_errors_array.push("La categoría es obligatoria")
+       }
+       if(document.getElementById("id_subcategory").value.length === 0){
+         ids_errors_array.push("id_subcategory");
+         content_errors_array.push("La subcategoría es obligatoria");
+       }
+       if(document.getElementById("id_unit_measurement").value.length === 0){
+         ids_errors_array.push("id_unit_measurement");
+         content_errors_array.push("La unidad de medida es obligatoria");
+       }
+       if(document.getElementById("id_available").value.length === 0){
+         ids_errors_array.push("id_available");
+         content_errors_array.push("Es necesario que conteste si esta disponible");
+       }
+       if(document.getElementById("id_allows_fraction").value.length === 0){
+         ids_errors_array.push("id_allows_fraction");
+         content_errors_array.push("Es necesario que conteste si puede vender una fracción de la unidad que oferta");
+       }
+     }
+
+   function show_errors() {
+     detail_errors();
+     let ids_form = ["id_name", "id_price", "id_image", "id_type", "id_category", "id_subcategory", "id_unit_measurement", "id_available", "id_allows_fraction", "id_description"];
+     for(let index in ids_form){
+       document.getElementById(ids_form[index]).classList.remove("is-invalid");
+       document.getElementById(ids_form[index]).classList.add("is-valid");
+     }
+     for(let index in ids_errors_array){
+       document.getElementById(ids_errors_array[index]).classList.remove("is-valid");
+       document.getElementById(ids_errors_array[index]).classList.add("is-invalid");
+       document.getElementById("error_"+ids_errors_array[index]).innerText = content_errors_array[index];
+     }
+     if(document.getElementById("report_errors") !== null){
+       document.getElementById("report_errors").remove();
+     }
+     let code = "<ul>";
+     for(let index in content_errors_array){
+        code = code + "<li>" + content_errors_array[index] + "</li>";
+     }
+     code = code + "</ul>";
+     code='<div id="report_errors" style="position: absolute; bottom: 0" class="alert alert-danger alert-dismissible fade show" role="alert">' +
+             '<svg  xmlns="http://www.w3.org/2000/svg" style="display: none;">' +
+             '<symbol id="exclamation-triangle-fill" viewBox="0 0 16 16">\n' +
+             '<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>\n' +
+             '</symbol></svg>' +
+             '<div class="alert alert-danger d-flex align-items-center" role="alert">' +
+             '<svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>' +
+             code+'</div>' +
+             '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+     document.getElementById("form").insertAdjacentHTML("beforeend",code);
+     ids_errors_array=[];
+     content_errors_array=[];
+   }
+
+   // Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false || check_boundaries() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+          show_errors();
+        }
+        //form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+ </script>
+{% endblock %}
