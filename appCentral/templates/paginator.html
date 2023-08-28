@@ -1,0 +1,84 @@
+{% if  request.get_full_path  == "/" %}
+<nav aria-label="Page navigation example" style="margin-bottom: 5%">
+  <ul class="pagination justify-content-center pagination-lg">
+    <li class="page-item disabled"><a class="page-link" >Anterior</a></li>
+    <li class="page-item active"><a class="page-link"  href="?page=1" >1</a></li>
+    <li class="page-item" id="second_li"><a class="page-link"  href="?page=2">2</a></li>
+    <li class="page-item" id="third_li"><a class="page-link" href="?page=3">3</a></li>
+    <li class="page-item" id="next_li"><a class="page-link" href="?page=2">Siguiente</a></li>
+  </ul>
+</nav>
+{% else %}
+<nav aria-label="Page navigation example" style="margin-bottom: 5%">
+  <ul class="pagination justify-content-center pagination-lg">
+    <li class="page-item" id="previous_li" ><a class="page-link" id="page_previous" href="">Anterior</a></li>
+    <li class="page-item" id="first_li" ><a class="page-link" id="first_page" href="" ></a></li>
+    <li class="page-item" id="second_li"><a class="page-link" id="second_page" href=""></a></li>
+    <li class="page-item" id="third_li"><a class="page-link" id="third_page" href=""></a></li>
+    <li class="page-item" id="next_li"><a class="page-link" id="page_next" href="">Siguiente</a></li>
+  </ul>
+</nav>
+<script>
+  var url="{{request.get_full_path|safe}}".split("=")
+  var id_pages=["page_previous", "first_page", "second_page", "third_page", "page_next"]
+  var id_lis=["previous_li", "first_li", "second_li", "third_li", "page_li"]
+  var page=url[1]
+  let n=Number(page);
+
+  if (n>3){
+    if(n%3==0){
+      n=n-2;
+    }
+    else if(n%3==2){
+      n=n-1;
+    }
+    document.getElementById("first_page").innerHTML = Number(page) - Number(page)%n ;
+    document.getElementById("second_page").innerHTML = Number(page) - Number(page)%n +1 ;
+    document.getElementById("third_page").innerHTML = Number(page) - Number(page)%n + 2 ;
+    document.getElementById(id_lis[Number(page)%n + 1]).classList.add("active");
+    document.getElementById(id_pages[0]).setAttribute("href","?page="+(Number(page) - 1 ).toString());
+    document.getElementById(id_pages[1]).setAttribute("href","?page="+(Number(page) - Number(page)%n ).toString());
+    document.getElementById(id_pages[2]).setAttribute("href","?page="+(Number(page) - Number(page)%n + 1).toString());
+    document.getElementById(id_pages[3]).setAttribute("href","?page="+(Number(page) - Number(page)%n + 2).toString());
+    document.getElementById(id_pages[4]).setAttribute("href","?page="+(Number(page) +1 ).toString());
+  }
+  else{
+    document.getElementById("first_page").innerHTML = 1;
+    document.getElementById("second_page").innerHTML = 2 ;
+    document.getElementById("third_page").innerHTML = 3 ;
+    if(Number(page)===1){
+      document.getElementById(id_lis[0]).classList.add("disabled");
+    }
+    document.getElementById(id_lis[Number(page)]).classList.add("active");
+    document.getElementById(id_pages[0]).setAttribute("href","?page="+(Number(page) - 1 ).toString());
+    document.getElementById(id_pages[1]).setAttribute("href","?page="+(1).toString());
+    document.getElementById(id_pages[2]).setAttribute("href","?page="+(2).toString());
+    document.getElementById(id_pages[3]).setAttribute("href","?page="+(3).toString());
+    document.getElementById(id_pages[4]).setAttribute("href","?page="+(Number(page) +1 ).toString());
+  }
+</script>
+
+{% endif %}
+<script>
+  var url="{{request.get_full_path|safe}}".split("=");
+  var page;
+  if(url.length === 2){
+    page= parseInt(url[1]);
+  }
+  else {
+    page=1;
+  }
+  var rate = parseInt((Number("{{number_goods|safe}}")-1)/6);
+  var number = parseInt(Number("{{number_goods|safe}}"));
+  let diff = number - page*6;
+  if(diff <= 0) {
+    document.getElementById("next_li").classList.add("disabled");
+  }
+  let array = ["third_li", "second_li"]
+  for(let index=0; index < 2 - rate; index=index+1){
+    document.getElementById(array[index]).classList.add("disabled");
+  }
+  function enableButtonPreviuos() {
+    document.getElementById("page_previous").classList.remove("disabled");
+  }
+</script>

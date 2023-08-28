@@ -1,0 +1,125 @@
+ {% extends "appCentral/padre.html"%}
+ {% load static%}
+ {% block content %}
+ <h2 id="first_title" class="fw-light" style="margin-top: 5%; text-align: center">¡Explora el mapa para encontrar proveedores de diversos bienes!</h2>
+ <div id="map" style="width: 90%; height: 500px; margin-left: 5%; margin-top: 5%; margin-bottom: 5%"></div>
+ {% if not user.is_authenticated or user.type_user.0 == 1 %}
+ <h2 class="fw-light" style="margin-top: 10px; text-align: center">Últimos productos subidos a la plataforma</h2>
+ <div class="row row-cols-1 row-cols-md-3 g-4" style="width: 90%; margin-left: 5%; margin-bottom: 5%; margin-top: 10px; text-align: center">
+     {% for good in goods%}
+     <div class="col">
+         <div class="card">
+         <div class="card-header"><h7 class="card-title">{{good.name}}</h7></div>
+             {% if good.image %}
+             <img src="{{good.image.url}}"class="card-img-top">
+             {% endif %}
+             <div class="card-body" style="text-align: center">
+                <p class="card-text">$ &nbsp{{good.price}}</p>
+                {% if good.description %}
+                 <details>
+                    <summary>
+                       Descripción
+                    </summary>
+                    {{good.description}}
+                </details>
+                 {% endif %}
+            </div>
+             {% if user.is_authenticated %}
+                <div class="card-footer"><a href="ventas/?good={{good.id}}"><button class="btn btn-primary">Solicitar</button></a></div>
+             {% else %}
+             <div class="card-footer"><a href="#"><button onclick="AvisarInicioSesion()" class="btn btn-primary">Solicitar</button></a></div>
+             {% endif %}
+         </div>
+     </div>
+
+ {% endfor %}
+    </div>
+ {% endif %}
+ {{ shops|json_script:"shop" }}
+ <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+ <script>
+     var ProviderIcon = L.Icon.extend({
+         options: {
+             iconUrl: 'static/appCentral/images/proveedor.png',
+             iconSize:     [30, 30],
+             iconAnchor:   [15, 15],
+             popupAnchor:  [0, -10]}});
+     var lng= -70.653510;
+     var lat=  -33.443668;
+     streets = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'});
+     var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'});
+
+     var baseMaps = {
+         "Callejero": streets,
+         "Mapa fisico": satellite
+     };
+
+     var map = L.map('map', {
+         center: [lat, lng],
+         zoom: 13,
+         layers: [streets]});
+
+
+
+var shops = JSON.parse(document.getElementById("shop").textContent);
+var providers_array = [];
+var technician_array = [];
+var providers_technician_array = [];
+
+for(let i=0; i<shops.length; i++){
+    let aux='<div class="card text-center" style="width: 18rem;">\n' +
+        '<div class="card-body">\n' +
+        '<h5 class="card-title">'+shops[i].properties.name+'</h5>\n' +
+        '<p class="card-text">'+shops[i].properties.goods+'</p>\n' +
+        shops[i].properties.button +
+        '  </div>\n' +
+        '<div class="card-footer">Icono de <a href="https://icons8.com/icon/53882/supplier">Icons8</a></div>'+
+        '</div>';
+    L.geoJSON(shops[i], {
+        pointToLayer: function (feature, latlng) {
+            let marker =L.marker(latlng, {icon: new ProviderIcon()}).bindPopup(aux);
+            if(shops[i].properties.products){
+                providers_array.push(marker);
+            }
+            if(shops[i].properties.services){
+                technician_array.push(marker);
+            }
+            if(shops[i].properties.services && shops[i].properties.products){
+                providers_technician_array.push(marker);
+            }
+            return marker;}});
+}
+
+providers = L.layerGroup(providers_array);
+technicians = L.layerGroup(technician_array);
+providers_technician = L.layerGroup(providers_technician_array)
+var overlayMaps = {
+    "Proveedores que ofrecen productos" : providers,
+    "Proveedores que ofrecen servicios" : technicians,
+    "Proveedores que ofrecen productos y servicios a la vez": providers_technician
+};
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+navigator.geolocation.getCurrentPosition(function(position) {
+    lat =  position.coords.latitude;
+    lng = position.coords.longitude;
+	map.setView([lat, lng], 13);
+    /*
+    * L.marker([lat, lng], {icon: new ProviderIcon()}).addTo(map).bindPopup("im a provider");
+    * */
+
+
+    },
+	function(err) {
+    console.error(err);
+	map.setView([lat, lng], 13);
+});
+
+
+   </script>
+ {% if not user.is_authenticated or user.type_user.0 == 1 %}
+ {% include 'paginator.html' %}
+ {% endif %}
+ {% endblock%}
