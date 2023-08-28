@@ -1,0 +1,763 @@
+{% extends "appCentral/padre.html"%}
+{% load static %}
+{% block content %}
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="exclamation-triangle-fill" viewBox="0 0 16 16">
+    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+  </symbol>
+</svg>
+<h2 style="text-align: center">Búsqueda personalizada</h2>
+<form id="form" onsubmit="return false;" method="post">
+  {% csrf_token %}
+  <div style="margin-bottom: 5%; width:90%; margin-left: 5%">
+    <div class="row">
+        <div class="col-md-4 mb-3 bg-secondary bg-opacity-25" style="border-radius: 10px; height: auto">
+          <div class="row" style="margin-left: 10px">Filtros:</div>
+          <div class="accordion" style="margin-top: 10px; margin-bottom: 10px" id="Filters">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="belong">
+                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#body_belong" aria-expanded="true" aria-controls="type_good">
+                  Pertenencia a una división
+                </button>
+              </h2>
+              <div id="body_belong" class="accordion-collapse collapse" aria-labelledby="body_type_good">
+                <div class="accordion-body">
+                  <div id="filter_type_good" class="row">
+                    <div class="col-md-4"><label for="types" style="font-size: 12pt">Tipo de bien:</label></div>
+                    <div class="col-md-8">
+                      <div class="d-flex w-100 justify-content-between">
+                        <select name="type_good" onclick="update_options(0);" class="form-select" multiple id="types"></select>
+                        <div class="col">
+                          <abbr style="margin-left: 10px" title="Deseleccionar opción">
+                            <button onclick="unselect_division(0)" style="border: white">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-node-minus" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M11 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM6.025 7.5a5 5 0 1 1 0 1H4A1.5 1.5 0 0 1 2.5 10h-1A1.5 1.5 0 0 1 0 8.5v-1A1.5 1.5 0 0 1 1.5 6h1A1.5 1.5 0 0 1 4 7.5h2.025zM1.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM8 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5A.5.5 0 0 1 8 8z"/>
+                              </svg>
+                            </button>
+                          </abbr>
+                          <abbr style="margin-left: 10px" title="Seleccione un tipo de bien para descartar los bienes que no pertenecen al tipo seleccionado">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                              <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                            </svg>
+                          </abbr>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="price">
+                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#body_price" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                  Precio
+                </button>
+              </h2>
+              <div id="body_price" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+                <div class="accordion-body">
+                  <div id="slider-range"></div>
+                  <input type="text" id="range" name="range" readonly style="border:0; font-size: 12pt; color: gray; width: 100%">
+                </div>
+              </div>
+              <input hidden id="min_price" name="min_price" type="number">
+              <input hidden id="max_price" name="max_price" type="number">
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="quality">
+                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#body_quality" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                  Calidad
+                </button>
+              </h2>
+              <div id="body_quality" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+                <div class="accordion-body" style="text-align: center">
+                  <button onclick="unselect_stars(0)" style="border: white; margin-right: 20px">
+                    <abbr title="Eliminar selección de rango de estrellas">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                      </svg>
+                    </abbr>
+                  </button>
+                  <span onclick="set_border_quality(0)" id="quality_0" class="fa fa-star star"></span>
+                  <span onclick="set_border_quality(1)" id="quality_1" class="fa fa-star star"></span>
+                  <span onclick="set_border_quality(2)" id="quality_2" class="fa fa-star star"></span>
+                  <span onclick="set_border_quality(3)" id="quality_3" class="fa fa-star star"></span>
+                  <span onclick="set_border_quality(4)" id="quality_4" class="fa fa-star star"></span>
+                  <abbr style="margin-left: 20px" title="Las estrellas que coloree representan el rango de estrellas que filtran la calidad en la búsqueda">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                      <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                    </svg>
+                  </abbr>
+                  <div style="margin-left: 10px">
+                    <input id="cantidad_estrellas_minima_quality" name="cantidad_estrellas_minima_quality" style="font-size: 12pt; border: white; width: 100%" type="text" readonly>
+                    <input id="cantidad_estrellas_maxima_quality" name="cantidad_estrellas_maxima_quality" style="font-size: 12pt; border: white; width: 100%" type="text" readonly>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="puntuality">
+                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#body_puntuality" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                  Puntualidad de llegada
+                </button>
+              </h2>
+              <div id="body_puntuality" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+                <div class="accordion-body" style="text-align: center">
+                  <button onclick="unselect_stars(1)" style="border: white; margin-right: 20px">
+                    <abbr title="Eliminar selección de rango de estrellas">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                      </svg>
+                    </abbr>
+                  </button>
+                  <span onclick="set_border_puntuality(0)" id="puntuality_0" class="fa fa-star star"></span>
+                  <span onclick="set_border_puntuality(1)" id="puntuality_1" class="fa fa-star star"></span>
+                  <span onclick="set_border_puntuality(2)" id="puntuality_2" class="fa fa-star star"></span>
+                  <span onclick="set_border_puntuality(3)" id="puntuality_3" class="fa fa-star star"></span>
+                  <span onclick="set_border_puntuality(4)" id="puntuality_4" class="fa fa-star star"></span>
+                  <abbr style="margin-left: 20px" title="Las estrellas que coloree representan el rango de estrellas que filtran la puntualidad de llegada en la búsqueda">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                      <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                    </svg>
+                  </abbr>
+                  <div style="margin-left: 10px">
+                    <input id="cantidad_estrellas_minima_puntuality" name="cantidad_estrellas_minima_puntuality" style="font-size: 12pt; border: white; width: 100%" type="text" readonly>
+                    <input id="cantidad_estrellas_maxima_puntuality" name="cantidad_estrellas_maxima_puntuality" style="font-size: 12pt; border: white; width: 100%" type="text" readonly>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="schedule">
+                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#body_schedule" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                  Horario de atención
+                </button>
+              </h2>
+              <div id="body_schedule" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+                <div class="accordion-body">
+                    <p style="text-align: center; font-size: 12pt">Seleccione una fecha para descartar las tiendas que no comercian en dicha fecha.</p>
+                    <div id="filter_date">
+                      <label class="form-label" style="font-size: 12pt" for="input_filter_date">Día:</label>
+                      <div class="d-flex w-100 justify-content-between">
+                        <input min={{current_date}} id="input_filter_date" name="input_filter_date" onchange="add_time_filter();" class="form-control" type="date">
+                        <button onclick="unselect_date();" style="border: white">
+                          <abbr title="Haga clic aquí para descartar la fecha seleccionada">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                            </svg>
+                          </abbr>
+                        </button>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="scope">
+                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#body_scope" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                  Alcance geográfico de despachos
+                </button>
+              </h2>
+              <div id="body_scope" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+                <div class="accordion-body">
+                  <p style="font-size: 12pt; text-align: center">Determine una ubicación geográfica para descartar a los proveedores que no llegan a aquella ubicación.</p>
+                  <div class="input-group" style="margin-left: 10px">
+                    <span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-pin-map-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M3.1 11.2a.5.5 0 0 1 .4-.2H6a.5.5 0 0 1 0 1H3.75L1.5 15h13l-2.25-3H10a.5.5 0 0 1 0-1h2.5a.5.5 0 0 1 .4.2l3 4a.5.5 0 0 1-.4.8H.5a.5.5 0 0 1-.4-.8l3-4z"/>
+                        <path fill-rule="evenodd" d="M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z"/>
+                      </svg>
+                    </span>
+                    <p id="p_coordinates" style="margin-left: 10px">Coordenadas: -.-</p>
+                    <input type="text" hidden name="longitude" id="longitude" readonly>
+                    <input type="text" hidden name="latitude" id="latitude" readonly>
+                  </div>
+                  <div id="button_location" class="row">
+                    <button id="other_location" class="btn btn-dark btn-sm col-md-12" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">Seleccionar ubicación en el mapa desplegable</button>
+                    {% if has_personal_location %}
+                    <button id="personal_location" class="btn btn-dark btn-sm col-md-12" onclick="set_location(0);" style="margin-top: 10px" type="button">Seleccionar ubicación personal</button>
+                    {% endif %}
+                  </div>
+                  <div style="height: 60%" class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+                    <div class="offcanvas-header">
+                      <h5 class="offcanvas-title" id="offcanvasBottomLabel">Mapa</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                      <!--<div id="map" style="width: 1300px; height: 250px"></div>-->
+                      <iframe id="custom_search_map" src="leaflet_map_custom_search" width="100%" height= "100%" style="max-width: 100%; box-sizing: border-box; margin-top: 25px"></iframe>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row"><button onclick="run_query();" class="button btn-secondary btn-sm">Aplicar filtros</button></div>
+        </div>
+      <div class="col-md-8 mb-3">
+        <div id="input_group_search_text" class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+          </svg></span>
+          <input  name="search_text" onchange="run_query();" type="text" class="form-control" placeholder="Nombre del producto o servicio" aria-label="Username" aria-describedby="basic-addon1"><button onclick="run_query();" class="btn btn-primary btn-lg">Buscar</button>
+        <small class="text-muted"><i>En caso de no escribir nada, no se considera la similitud por nombre para descartar bienes.</i></small>
+        </div>
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a id="list_item" onclick="ChangeItemSelected(0)" class="nav-link active">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+              </svg>&nbsp;&nbsp;Lista</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="map_item" onclick="ChangeItemSelected(1)" aria-current="page">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-map" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.402.49l-5 1a.502.502 0 0 1-.196 0L5.5 15.01l-4.902.98A.5.5 0 0 1 0 15.5v-14a.5.5 0 0 1 .402-.49l5-1a.5.5 0 0 1 .196 0L10.5.99l4.902-.98a.5.5 0 0 1 .415.103zM10 1.91l-4-.8v12.98l4 .8V1.91zm1 12.98 4-.8V1.11l-4 .8v12.98zm-6-.8V1.11l-4 .8v12.98l4-.8z"/>
+              </svg>&nbsp;&nbsp;Mapa</a>
+          </li>
+        </ul>
+        <input type="text" value="list" hidden readonly id="map_list" name="map_list">
+
+      </div>
+    </div>
+</div>
+</form>
+
+<!--
+<form method="POST" id="dynamic_query_form">
+    {% csrf_token %}
+    <div class="container"  id="filter_search_container">
+    <div class="row">
+        <label style="text-align: center">Filtrar por:</label>
+        <div class="col-md-2 mb-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="type_good" role="switch" id="type_good" onclick="filter_good('type_good');">
+                <label class="form-check-label" for="type_good">Tipo de bien (producto o servicio)</label>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="form-check form-switch">
+                <input onclick="filter_price();" name="price" class="form-check-input" type="checkbox" role="switch" id="price">
+                <label class="form-check-label" for="price">Precio</label>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input" onclick="filter_quality();" type="checkbox" role="switch" name="quality" id="quality">
+                <label class="form-check-label" for="quality">Calidad</label>
+            </div>
+        </div>
+     <div class="col-md-2 mb-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" onclick="filter_puntuality();" role="switch" name="puntuality" id="puntuality">
+            <label class="form-check-label" for="puntuality">Puntualidad</label>
+        </div>
+     </div>
+     <div class="col-md-2 mb-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" name="office_hours" onclick="slider_range();" type="checkbox" role="switch" id="office_hours">
+            <label class="form-check-label"  for="office_hours">Horario de atención</label>
+        </div>
+     </div>
+     <div class="col-md-2 mb-3">
+        <div class="form-check form-switch">
+            {% if user.location.x == 0 and user.location.y == 0%}
+            <input name="geo" class="form-check-input" type="checkbox" role="switch" onclick="custom_search_map();" id="geographic_coverage_area_without_personal_location">
+            {% elif not user.is_authenticated %}
+            <input name="geo" class="form-check-input" type="checkbox" role="switch" onclick="custom_search_map();" id="geographic_coverage_area_without_login">
+            {% else %}
+            <input name="geo" class="form-check-input" type="checkbox" role="switch" onclick="ask_for_type_location();" id="geographic_coverage_area_with_personal_location">
+            {% endif %}
+            <label class="form-check-label" for="geographic_coverage_area_with_personal_location" for="geographic_coverage_area_without_personal_location" for="geographic_coverage_area_without_login" >Cobertura geografica de despachos</label>
+        </div>
+    </div>
+ </div>
+</div>
+<div class="container" id="sight_search_container">
+<div class="row" style="margin-top: 5%" id="div_id_map_list">
+        <div class="col-md-4 mb-3">
+            <label>
+                Mostrar los resultados en:
+            </label>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="map_list" id="map_list_0" value="map" >
+                <label class="form-check-label" for="map_list_0">
+                    un mapa
+                </label>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3" >
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="map_list" id="map_list_1" value="list" checked>
+                <label class="form-check-label" for="map_list_1" > una lista</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+</form>
+<button id="button_form" onclick="run_query();" class="btn btn-primary btn-lg" style="width: 10%; margin-left: 45%; margin-bottom: 5%">Buscar</button>
+
+-->
+
+{{ types_categories_subcategories |json_script:"types_categories_subcategories" }}
+<script src="{% static 'appCentral/js/shared_methods.js' %}" ></script>
+<!--
+<script src="{% static 'appCentral/js/custom_search.js' %}" ></script>
+-->
+
+<script>
+  var locations_array = []
+  //var lng= -70.653510;
+  //var lat=  -33.443668;
+  //var map=L.map('map').setView([lat, lng], 18);
+  //var marker_actual;
+  var min_price= Number("{{min_price}}");
+  var max_price= Number("{{max_price}}");
+  var min_quality = 0;
+  var max_quality = 0;
+  var min_puntuality=0;
+  var max_puntuality=0;
+  var range_array=[[min_quality, max_quality], [min_puntuality, max_puntuality]];
+  var types_categories_subcategories = JSON.parse(document.getElementById("types_categories_subcategories").textContent);;
+  var types = [];
+  var categories = [];
+  var subcategories = [];
+  var types_categories_subcategories_array = [types, categories, subcategories];
+  var exists_filter_time = false;
+  var ids_array=["types"];
+  var output_data;
+
+ //L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
+
+
+  function set_location(n){
+    let buttons_array=["personal_location", "other_location"];
+    document.getElementById("longitude").value = locations_array[2 * n];
+    document.getElementById("latitude").value = locations_array[2 * n + 1];
+    if(document.getElementById(buttons_array[n]) != null){
+      if (document.getElementById(buttons_array[n]).innerText === "Seleccionar ubicación personal") {
+        document.getElementById("p_coordinates").innerHTML = "Coordenadas<br> Longitud: " + locations_array[2 * n] + "<br> Latitud: " + locations_array[2 * n + 1]
+        document.getElementById(buttons_array[n]).innerText = "Deseleccionar ubicación personal";
+        return;
+      }
+      if (document.getElementById(buttons_array[n]).innerText === "Deseleccionar ubicación personal" || document.getElementById(buttons_array[n]).innerText === "Deseleccionar ubicación escogida del mapa") {
+        //remove_markers();
+        document.getElementById("longitude").value = "";
+        document.getElementById("latitude").value = "";
+        document.getElementById("p_coordinates").innerHTML = "Coordenadas: -.-";
+        if(document.getElementById(buttons_array[0]) != null){
+          document.getElementById(buttons_array[0]).innerText = "Seleccionar ubicación personal";
+        }
+        document.getElementById(buttons_array[1]).remove();
+        document.getElementById("button_location").innerHTML = '<button id="other_location" class="btn btn-dark btn-sm col-md-12" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">Seleccionar ubicación en el mapa desplegable</button>\n' + document.getElementById("button_location").innerHTML;
+        return;
+      }
+      //if(document.getElementById(buttons_array[n]).innerText === "Seleccionar ubicación en el mapa desplegable"){
+        //document.getElementById("p_coordinates").innerHTML = "Coordenadas<br> Longitud: " + locations_array[2 * n] + "<br> Latitud: " + locations_array[2 * n + 1]
+        //document.getElementById(buttons_array[n]).remove();
+        //document.getElementById("button_location").innerHTML = "<button id='other_location' class=\"btn btn-dark btn-sm col-md-12\" type=\"button\" onclick='set_location(1)'>Deseleccionar ubicación en el mapa desplegable</button>" + document.getElementById("button_location").innerHTML
+        //return;
+      //}
+    }
+
+  }
+
+  function remove_markers(){
+    for(var key in map._layers){
+      if (key != "25" && key != "44"){
+        map.removeLayer(map._layers[key]);
+      }
+    }
+  }
+
+  $(function (){
+    locations_array.push("{{personal_location_x}}");
+    locations_array.push("{{personal_location_y}}");
+    for(let index in types_categories_subcategories){
+      if(types_categories_subcategories[index].type === "type_good"){
+        types.push(types_categories_subcategories[index]);
+      }
+      if(types_categories_subcategories[index].type === "category"){
+        categories.push(types_categories_subcategories[index]);
+      }
+      if(types_categories_subcategories[index].type === "subcategory"){
+        subcategories.push(types_categories_subcategories[index]);
+      }
+    }
+    for(let index in types){
+      document.getElementById("types").innerHTML = document.getElementById("types").innerHTML + '<option value="'+types[index].name+'">'+types[index].name+'</option>';
+    }
+  });
+/*
+*   map.on('click', function (e){
+		remove_markers();
+        lat=e.latlng.lat;
+		lng=e.latlng.lng;
+		marker_actual = L.marker([lat, lng]);
+		marker_actual.addTo(map);
+        if(locations_array.length === 2){
+          locations_array.push(marker_actual._latlng.lng);
+          locations_array.push(marker_actual._latlng.lat);
+        }
+        else{
+          locations_array[2]=marker_actual._latlng.lng;
+          locations_array[3]=marker_actual._latlng.lat;
+        }
+        set_location(1);
+	})
+
+  navigator.geolocation.getCurrentPosition(function(position) {
+    lat =  position.coords.latitude;
+    lng = position.coords.longitude;
+	map.setView([lat, lng], 18);
+    }
+    ,
+	function(err) {
+    console.error(err);
+
+});
+
+* */
+
+  function unselect_division(n){
+    let ids_select_array=["types","categories","subcategories"];
+    document.getElementById(ids_select_array[n]).value="";
+    if( n === 0 ){
+      $("#filter_category").remove();
+      $("#filter_subcategory").remove();
+      ids_array=["types"];
+    }
+    if( n === 1 ){
+      $("#filter_subcategory").remove();
+      ids_array=["types","categories"];
+    }
+  }
+
+  function unselect_date(){
+    document.getElementById("input_filter_date").value='';
+    $("#filter_time").remove();
+    exists_filter_time=false;
+  }
+
+  function unselect_time(){
+    document.getElementById("input_filter_time").value='';
+  }
+
+  function add_time_filter(){
+    if(!exists_filter_time){
+      exists_filter_time = true;
+    }
+    else{
+      $("#filter_time").remove();
+    }
+    let time="{{current_time}}";
+      let min="";
+      if(document.getElementById("input_filter_date").value === "{{current_date}}"){
+        min = "{{current_time}}";
+        min = min.split('.')[0];
+        min = min.split(':')[0] + ":" + min.split(':')[1] + ":00"
+      }
+      let code='<div id="filter_time"><p style="font-size: 12pt; text-align: center; margin-top: 20px">Seleccione una hora para que se descarten las tiendas que no comercien en dicha fecha y hora.</p>' +
+              '<label style="font-size: 12pt" class="form-label" for="input_filter_time">Hora:</label>\n' +
+              '<div class="d-flex w-100 justify-content-between">' +
+              '<input min="'+min+'" class="form-control" id="input_filter_time" name="input_filter_time" type="time">' +
+              '<button onclick="unselect_time();" style="border: white">\n' +
+              '<abbr title="Haga clic aquí para descartar la hora seleccionada">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">\n' +
+              '<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>\n' +
+              '<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>\n' +
+              '</svg></abbr></button></div></div>';
+      document.getElementById("filter_date").insertAdjacentHTML("afterend",code);
+  }
+
+  function update_options(n){
+    let father = document.getElementById(ids_array[n]).value;
+    if(n===0) {
+      if(ids_array.length==1){
+        let code='<div id="filter_category" class="row" style="margin-top: 10px">' +
+                '<div class="col-md-4"><label for="categories" style="font-size: 12pt">Categoría:</label></div>' +
+                '<div class="col-md-8">' +
+                '<div class="d-flex w-100 justify-content-between">' +
+                '<select name="category" onclick="update_options(1);" class="form-select" multiple id="categories"></select>' +
+                '<div class="col">' +
+                '<abbr style="margin-left: 10px" title="Deseleccionar opción">' +
+                '<button onclick="unselect_division(1)" style="border: white">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-node-minus" viewBox="0 0 16 16">' +
+                '<path fill-rule="evenodd" d="M11 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM6.025 7.5a5 5 0 1 1 0 1H4A1.5 1.5 0 0 1 2.5 10h-1A1.5 1.5 0 0 1 0 8.5v-1A1.5 1.5 0 0 1 1.5 6h1A1.5 1.5 0 0 1 4 7.5h2.025zM1.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM8 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5A.5.5 0 0 1 8 8z"/>' +
+                '</svg>' +
+                '</button>' +
+                '</abbr>'+
+                '<abbr style="margin-left: 10px" title="Seleccione una categoría para descartar los bienes que no pertenecen a la categoría seleccionada">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">' +
+                '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
+                '<path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>' +
+                '</svg>' +
+                '</abbr></div>' +
+                '</div>' +
+                '</div></div>';
+        document.getElementById("filter_type_good").insertAdjacentHTML("afterend", code);
+        ids_array.push("categories");
+      }
+      for (let i = 1; i < ids_array.length; i++) {
+        document.getElementById(ids_array[i]).innerHTML = "";
+      }
+      for (let i= 0; i < types_categories_subcategories_array[1].length; i++) {
+        if (types_categories_subcategories_array[1][i].father === father) {
+          document.getElementById(ids_array[1]).innerHTML = document.getElementById(ids_array[1]).innerHTML + '<option id="' + types_categories_subcategories_array[1][i].name + '" value="' + types_categories_subcategories_array[1][i].name + '">' + types_categories_subcategories_array[1][i].name + '</option>';
+
+          /*
+          * for(let j=0; j<types_categories_subcategories_array[2].length; j++){
+            if(types_categories_subcategories_array[2][j].father === types_categories_subcategories_array[1][i].name){
+              document.getElementById(ids_array[2]).innerHTML = document.getElementById(ids_array[2]).innerHTML + '<option id="' + types_categories_subcategories_array[2][j].name + '" value="' + types_categories_subcategories_array[2][j].name + '">' + types_categories_subcategories_array[2][j].name + '</option>';
+            }
+          }
+          *
+          * */
+
+        }
+      }
+    }
+    if(n===1){
+      if(ids_array.length==2){
+        let code='<div id="filter_subcategory" class="row" style="margin-top: 10px">' +
+                '<div class="col-md-4"><label for="subcategories" style="font-size: 12pt">Subcategoría:</label></div>' +
+                '<div class="col-md-8">' +
+                '<div class="d-flex w-100 justify-content-between">' +
+                '<select name="subcategory" class="form-select" multiple id="subcategories"></select>' +
+                '<div class="col">'+
+                '<abbr style="margin-left: 10px" title="Deseleccionar opción">' +
+                '<button onclick="unselect_division(2)" style="border: white">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-node-minus" viewBox="0 0 16 16">' +
+                '<path fill-rule="evenodd" d="M11 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM6.025 7.5a5 5 0 1 1 0 1H4A1.5 1.5 0 0 1 2.5 10h-1A1.5 1.5 0 0 1 0 8.5v-1A1.5 1.5 0 0 1 1.5 6h1A1.5 1.5 0 0 1 4 7.5h2.025zM1.5 7a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM8 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5A.5.5 0 0 1 8 8z"/>' +
+                '</svg>' +
+                '</button>' +
+                '</abbr>'+
+                '<abbr style="margin-left: 10px" title="Seleccione una subcategoría para descartar los bienes que no pertenecen a la subcategoría seleccionada">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">' +
+                '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
+                '<path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>' +
+                '</svg>' +
+                '</abbr>' +
+                '</div></div>' +
+                '</div></div>';
+        document.getElementById("filter_category").insertAdjacentHTML("afterend", code);
+        ids_array.push("subcategories");
+      }
+
+      document.getElementById(ids_array[2]).innerHTML = "";
+      for (let i = 0; i < types_categories_subcategories_array[2].length; i++) {
+        if (types_categories_subcategories_array[2][i].father === father) {
+          document.getElementById(ids_array[2]).innerHTML = document.getElementById(ids_array[2]).innerHTML + '<option id="' + types_categories_subcategories_array[2][i].name + '" value="' + types_categories_subcategories_array[2][i].name + '">' + types_categories_subcategories_array[2][i].name + '</option>';
+        }
+      }
+    }
+  }
+
+
+
+  function unselect_stars(number) {
+      let stars_array = [["quality_0","quality_1","quality_2","quality_3","quality_4"], ["puntuality_0","puntuality_1","puntuality_2","puntuality_3","puntuality_4"]];
+      let inputs_array =[["cantidad_estrellas_minima_quality", "cantidad_estrellas_maxima_quality"], ["cantidad_estrellas_minima_puntuality", "cantidad_estrellas_maxima_puntuality"]];
+      range_array[number][0]=0;
+      range_array[number][1]=0;
+      for(let i in stars_array[number]){
+          document.getElementById(stars_array[number][i]).classList.remove('star-checked');
+      }
+      for(let i in inputs_array[number]){
+          document.getElementById(inputs_array[number][i]).value="";
+      }
+  }
+
+  function fill_stars_between(type, m) {
+    for(let i=0; i<5; i++){
+      document.getElementById(type +"_" + i).classList.remove('star-checked');
+    }
+    for(let i=range_array[m][0]-1; i<range_array[m][1]; i++){
+      document.getElementById(type + "_" + i).classList.add('star-checked');
+    }
+  }
+
+  function announce_stars(type, m) {
+    document.getElementById('cantidad_estrellas_minima_'+type).value="Cantidad mínima de estrellas: " + range_array[m][0] ;
+    document.getElementById('cantidad_estrellas_maxima_'+type).value="Cantidad máxima de estrellas: " + range_array[m][1] ;
+}
+
+  function set_border_quality(n){
+      update_range("quality",n,0);
+  }
+
+  function set_border_puntuality(n){
+      update_range("puntuality",n,1);
+  }
+
+  function update_range(type, n, m) {
+      let min=range_array[m][0];
+      let max=range_array[m][1];
+      if((min === max && max === 0) || (n+1>= min && n+1 <= max )){
+          for(let i=0; i<5; i++){
+              document.getElementById(type + "_" +i).classList.remove('star-checked');
+          }
+          document.getElementById(type + "_" +n).classList.add('star-checked');
+          range_array[m][0]=n+1;
+          range_array[m][1]=n+1;
+      }
+      else{
+          if(n+1< min ){
+              range_array[m][0] = n+1;
+          }
+          if(n+1 > max ){
+              range_array[m][1] = n+1;
+          }
+          fill_stars_between(type, m);
+      }
+      announce_stars(type, m);
+  }
+
+  function turn_to_money(n){
+    let text = n.toString();
+    let money="";
+    for(let index=text.length-1; index>=0; index--){
+      if(index < text.length-1  && (text.length - 1 - index)%3 === 0){
+        money ="." + money ;
+      }
+      money = text[index] + money;
+    }
+    return "$"+money;
+  }
+
+  $(function(){
+    turn_to_money(max_price);
+    $( "#slider-range" ).slider({
+      range: true,
+      min: min_price,
+      max: max_price,
+      values: [ min_price, max_price ],
+      slide: function( event, ui ) {
+        $( "#range" ).val( "Mínimo: " + turn_to_money(ui.values[ 0 ]) + " - Máximo: "  + turn_to_money(ui.values[ 1 ]));
+        document.getElementById("min_price").value = ui.values[ 0 ];
+        document.getElementById("max_price").value = ui.values[ 1 ];
+      }});
+    $( "#range" ).val( "Mínimo: "+turn_to_money(Number($( "#slider-range" ).slider( "values", 0 )))+" - Máximo: "+turn_to_money(Number($( "#slider-range" ).slider( "values", 1 ))));});
+
+  function ChangeItemSelected(n){
+    let ids=["list_item", "map_item"];
+    document.getElementById(ids[(n+1)%ids.length]).classList.remove("active");
+    document.getElementById(ids[n]).classList.add("active");
+    document.getElementById("map_list").value = ids[n].split('_')[0]
+    if(n === 0){
+      show_goods_list(output_data.goods);
+    }
+    else{
+      show_custom_output_map(output_data);
+    }
+  }
+
+  function get_code_stars(mark) {
+    let code='';
+    let n = 0;
+    if(mark !== "-.-"){
+      n = parseInt(mark);
+    }
+    for(let i=0; i<n; i++){
+      code = code + '<span class="fa fa-star star star-checked"></span>';
+    }
+    for(let i=n; i<5; i++){
+      code = code + '<span class="fa fa-star star"></span>';
+    }
+    code = code + '';
+    return code;
+  }
+
+  function show_goods_list(info){
+    let file="<div id='goods_list' class='container'>";
+
+    for(let i=0; i<info.length; i++){
+        let date=info[i].date_joined.split(' ')[0];
+        let time=info[i].date_joined.split(' ')[1];
+        file = file+'<div class="card mb-3" style="max-width: 100%;">\n' +
+            '<div class="row g-0">\n' +
+            '<div class="col-md-4">\n' +
+            '<img src="'+info[i].url+'" class="img-fluid rounded-start" alt="..."></div>\n' +
+            '<div class="col-md-6">\n' +
+            '<div class="card-body">\n' +
+            '<h5 class="card-title" style="text-align: center"><b>'+info[i].name+'</b></h5>\n' +
+            '<div style="text-align: center"><small><a href="../../tienda/?id='+info[i].shop_id+'" class="card-link">'+info[i].type_good+' de '+info[i].shop_name +'</a></small></div>' +
+            '<p class="card-text"><b>Precio:</b> $'+info[i].price+' el '+info[i].unit_measurement+'</p>';
+        if(info[i].description.length > 0){
+          file = file + '<p class="card-text"><b>Descripción:</b> '+info[i].description+'</p>';
+        }
+                if(info[i].mark !== "-.-"){
+                  let code_stars = get_code_stars(info[i].mark);
+                  file=file + '<div class="card-text"><b>Calidad:</b> '+info[i].mark+' '+code_stars+'</div>';
+                }
+                else{
+                  file= file + '<p class="card-text text-muted"><span class="fa fa-star star"></span><i>Sin evaluaciones</i></p>';
+                }
+                file = file+ '</div></div><div class="col-md-2">';
+        if(info[i].logged){
+            file = file + '<a href="'+ info[i].link +'" class="btn btn-lg btn-primary" style="user-select: none; text-decoration: none; margin: 5px">';
+        }
+        else{
+            file = file + '<a href="#" onclick="AvisarInicioSesion();" class="btn btn-lg btn-primary" style="user-select: none; text-decoration: none">';
+        }
+        file = file + '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-coin" viewBox="0 0 16 16">' +
+                '  <path d="M5.5 9.511c.076.954.83 1.697 2.182 1.785V12h.6v-.709c1.4-.098 2.218-.846 2.218-1.932 0-.987-.626-1.496-1.745-1.76l-.473-.112V5.57c.6.068.982.396 1.074.85h1.052c-.076-.919-.864-1.638-2.126-1.716V4h-.6v.719c-1.195.117-2.01.836-2.01 1.853 0 .9.606 1.472 1.613 1.707l.397.098v2.034c-.615-.093-1.022-.43-1.114-.9H5.5zm2.177-2.166c-.59-.137-.91-.416-.91-.836 0-.47.345-.822.915-.925v1.76h-.005zm.692 1.193c.717.166 1.048.435 1.048.91 0 .542-.412.914-1.135.982V8.518l.087.02z"/>\n' +
+                '  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
+                '  <path d="M8 13.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zm0 .5A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"/>' +
+                '</svg>' +
+            'Solicitar</a></div>' +
+                '<div class="card-footer"><small class="text-muted">Subido el '+date+' a las '+time+'</small></div></div></div>';
+    }
+    file=file+"</div>"
+    document.getElementById("output_body").innerHTML = file;
+}
+
+  function show_custom_output_map(info){
+    datos= info;
+    let iframe_map='<iframe id="custom_output_map" src="leaflet_custom_output_map" width='+window.innerWidth*0.8+' height= '+window.innerHeight+' style="max-width: 100%; box-sizing: border-box; margin-top: 25px"></iframe>';
+    document.getElementById("output_body").innerHTML = iframe_map;
+  }
+
+  function run_query(){
+    if(document.getElementById("output_body") !== null){
+      document.getElementById("output_body").remove();
+    }
+    document.getElementById("map_list").insertAdjacentHTML("afterend",'<div id="output_body" class="bg-light" style="overflow: auto; height: 700px"></div>');
+    let code='<div class="d-flex justify-content-center" id="loader" style="margin-top: 10px"><div class="spinner-border text-primary" role="status"></div></div>';
+    document.getElementById("output_body").insertAdjacentHTML("afterbegin", code);
+    fetch("",{
+        method:"POST",
+        body: new FormData(document.getElementById("form")),
+        headers:{
+            'X-CSRFToken': getCookie('csrftoken'),
+            "X-Requested-With": "XMLHttpRequest"
+        }}).then(function (response){
+            return response.json();}).then(
+                function (data){
+                  if( document.getElementById("announce_length") != null){
+                    document.getElementById("announce_length").remove();
+                  }
+                  let code= '<div id="announce_length" class="alert alert-success" role="alert">'+data.number_goods+' bienes encontrados de '+data.number_shops+' tiendas distintas</div>';
+                  document.getElementById("input_group_search_text").insertAdjacentHTML("afterend", code);
+                  output_data = data;
+                  if(document.getElementById("map_list").value === "list"){
+                    show_goods_list(data.goods);
+                  }
+                  else{
+                    show_custom_output_map(data);
+                  }
+                });
+    document.getElementById("loader").remove();
+  }
+
+</script>
+{% endblock %}
