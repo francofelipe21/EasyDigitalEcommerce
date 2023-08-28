@@ -1,0 +1,61 @@
+ {% extends "appCentral/padre.html"%}
+ {% load static %}
+ {% block content %}
+
+ <form method="post" id="form" action="" style="color: black; margin-bottom: 10%" class="needs-validation" novalidate xmlns="http://www.w3.org/1999/html">
+     <div style="width: 75%; margin: auto">
+         <h2 style="text-align: center; margin-top: 10px; margin-bottom: 10px">Registro de usuario</h2>
+         <p>Los campos con "*" son obligatorios</p>
+         {% csrf_token %}
+
+<div class="row">
+    <div class="col-md-6 mb-3">{{form.first_name.label}}*{{form.first_name}}<small class="text-muted">{{form.first_name.help_text}}</small>
+        <div ><small id="succes_first_name" style="color: green"></small></div>
+        <div ><small id="error_first_name" style="color: red"></small></div></div>
+    <div class="col-md-6 mb-3">{{form.last_name.label}}*{{form.last_name}}<small class="text-muted">{{form.last_name.help_text}}</small>
+        <div ><small id="succes_last_name" style="color: green"></small></div>
+        <div><small id="error_last_name" style="color: red"></small></div></div>
+    <div class="col-md-6 mb-3">{{form.email.label}}*{{form.email}}
+        <div><small id="succes_email" style="color: green"></small></div>
+        <div><small id="error_email" style="color: red"></small></div></div>
+  <div class="col-md-2 mb-3">{{form.prefijo_phonenumber.label}}{{form.prefijo_phonenumber}}</div>
+  <div class="col-md-4 mb-3">{{form.phonenumber.label}}{{form.phonenumber}}
+      <div><small id="succes_phonenumber" style="color: green"></small></div>
+      <div><small id="error_phonenumber" style="color: red"></small></div></div>
+  <div class="col-md-6 mb-3" id="div_id_personal_location">{{form.personal_location.label}}* {{form.personal_location}}
+      <div><small id="succes_personal_location" style="color: green"></small></div>
+      <div><small id="error_personal_location" style="color: red"></small></div></div>
+    <div class="col-md-6 mb-3" id="div_id_type_user">{{form.type_user.label}}*
+        <abbr title='Marque "Cliente" si desea comprar. Marque "Proveedor de bienes y/o servicios" si desea proveer. Si desea ambas actividades, marque ambos tipos.'>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+            </svg>
+        </abbr>
+        {{form.type_user}}
+        <div><small id="succes_type_user" style="color: green"></small></div>
+        <div><small id="error_type_user" style="color: red"></small></div>
+    </div>
+</div>
+
+    <div class="col-md-12 mb-3">{{form.password1.label}}* {{form.password1}}
+        <ul>
+            {% for help in form.password1.help_text %}
+            <li><small class="text-muted">{{help}}</small></li>
+            {% endfor %}
+        </ul>
+        <div><small id="succes_password1" style="color: green"></small></div>
+        <div><small id="error_password1" style="color: red"></small></div>
+    </div>
+    <div class="col-md-12 mb-3">
+        {{form.password2.label}}* {{form.password2}}
+        <div><small id="succes_password2" style="color: green"></small></div>
+        <div><small id="error_password2" style="color: red"></small></div>
+    </div>
+ </div>
+ <button type="submit" class="btn btn-success" style="margin-top: 25px; margin-left: 40%; width: 20%">Crear cuenta</button>
+ </div>
+</form>
+ <script src="{% static 'appCentral/js/formularioDinamico/registro.js' %}"></script>
+ <script src="{% static 'appCentral/js/formularioDinamico/validacion_formulario_registro.js' %}"></script>
+ {% endblock %}
